@@ -15,6 +15,33 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.bg-meeting5 {
+  background-color: #E6E6E6;
+}
+
+.main-blue-meeting5 {
+  color: #2E5BDA;
+}
+
+.button-green1-meeting5 {
+  background-color: #2DCD71;
+  color: white;
+}
+
+.button-blue1-meeting5 {
+  background-color: #2E91D9;
+  color: white;
+}
+
+.button-blue2-meeting5 {
+  background-color: #362ED9;
+  color: white;
+}
+
+.input-blue-meeting5 {
+  background-color: #F2F8FF;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
