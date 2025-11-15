@@ -9,6 +9,10 @@
   background-color: #E6E6E6;
 }
 
+input{
+  background-color: #F2F8FF;
+}
+
 .main-blue-meeting5 {
   color: #2E5BDA;
 }
@@ -17,7 +21,8 @@
   background-color: #2E5BDA;
 }
 
-.button-green1-meeting5 {
+
+.button-green-meeting5 {
   background-color: #2DCD71;
   color: white;
 }

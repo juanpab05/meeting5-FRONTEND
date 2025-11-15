@@ -28,8 +28,7 @@ const RoutesMeeting5 = () => {
           <Route path="/recover-password" element={<RecoverPassword />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/home" element={<HomePage />} />
-          <Route path="/about-us" element={<AboutPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/sign-in" element={<LoginPage />} />
           <Route path="/profile" element={<UserProfile />} />
         </Routes>
       </LayoutMeeting5>

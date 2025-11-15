@@ -20,22 +20,17 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
   /**
    * Rutas donde el encabezado no debe mostrarse.
    */
-  const noHeaderRoutes = ["/", "/sign-in", "/sign-up", "/recover-password", "/about-us"];
+  const noHeaderRoutes = ["/sign-in", "/sign-up", "/recover-password", "/reset-password"];
 
   /**
    * Rutas públicas accesibles sin autenticación.
    */
   const publicRoutes = [
-    "/home",
     "/reset-password",
-    "/about-us",
     "/sign-in",
     "/sign-up",
     "/",
     "/recover-password",
-    "/catalog",
-    "/view-movie",
-    "/view-movie/:id",
   ];
 
   /**
@@ -66,8 +61,8 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
         if (!token) {
           setIsAuth(false);
 
-          // Si el usuario no está en una ruta pública, redirigir a "home".
-          if (!isPublicRoute(location.pathname)) navigate("/home");
+          // Si el usuario no está en una ruta pública, redirigir a "/".
+          if (!isPublicRoute(location.pathname)) navigate("/");
           return;
         }
 
@@ -75,12 +70,12 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
         if (response) {
           setIsAuth(true);
 
-          // Si el usuario está en una ruta pública exclusiva, redirigir a "home".
-          if (publicOnlyRoutes.includes(location.pathname)) navigate("/home");
+          // Si el usuario está en una ruta pública exclusiva, redirigir a "/".
+          if (publicOnlyRoutes.includes(location.pathname)) navigate("/");
         } else {
           localStorage.removeItem("token");
           setIsAuth(false);
-          navigate("/home");
+          navigate("/");
         }
       } catch (error) {
         console.error("Error verificando token:", error);
@@ -105,7 +100,7 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
 
   return (
     <>
-      {/* Encabezado condicional */}
+      {/* Mostrar header */}
       {!shouldHideHeader && (
         <>
           <div className="hidden sm:block" role="banner" aria-label="Encabezado de escritorio">
@@ -117,24 +112,9 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
         </>
       )}
 
-      {/* Contenido principal */}
-      <main
-        className="
-        w-full max-w-screen min-h-screen
-        overflow-x-hidden flex justify-center items-center
-        bg-gradient-to-b from-gray-900 via-black to-gray-900 
-        text-white pt-16
-        "
-        role="main"
-        aria-label="Contenido principal de la página"
-      >
-        <div
-          className="
-          absolute inset-0 bg-[url('/textures/noise.svg')] opacity-10 pointer-events-none
-          "
-        />
+        {/* Contenido de la página */}
         {children}
-      </main>
+
 
       {/* Pie de página */}
       <Footer auth={isAuth} aria-label="Pie de página" />

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { CinemaLogo } from "../components/CinemaLogo";
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { fetchResetPassword } from '../api/reset-password';
 
@@ -11,6 +10,9 @@ const ResetPasswordPage: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [token, setToken] = useState('');
   const navigate = useNavigate();
+  const handleGoToLogin = () => navigate('/sign-in');
+  const timeoutRef = useRef<number | null>(null);
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -22,6 +24,16 @@ const ResetPasswordPage: React.FC = () => {
       setError('Token no válido. Por favor, usa el enlace completo del correo.');
     }
   }, []);
+
+
+
+  // navigate to sign-in when success becomes true (keeps a short delay)
+  useEffect(() => {
+    if (success) {
+      const tid = window.setTimeout(() => navigate('/sign-in'), 3000);
+      timeoutRef.current = tid;
+    }
+  }, [success, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +61,6 @@ const ResetPasswordPage: React.FC = () => {
     try {
       await fetchResetPassword(token, newPassword, confirmPassword);
       setSuccess(true);
-      setTimeout(() => navigate('/sign-in'), 3000);
     } catch (error: any) {
       setError(error.message || 'Error al restablecer la contraseña.');
     } finally {
@@ -57,73 +68,26 @@ const ResetPasswordPage: React.FC = () => {
     }
   };
 
-  const handleGoToLogin = () => navigate('/sign-in');
-  const handleGoHome = () => navigate('/home');
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl shadow-2xl overflow-hidden">
-          <div className="p-8">
-            <div className="flex justify-center mb-8">
-              <button
-                onClick={handleGoHome}
-                className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
-                aria-label="Ir a la página de inicio"
-              >
-                <CinemaLogo size="w-32 h-32" />
-              </button>
-            </div>
-
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              </div>
-            </div>
-
-            <div className="text-center mb-8">
-              <h1 className="text-white text-3xl font-bold mb-3" id="reset-success-title">¡Contraseña Restablecida!</h1>
-              <p className="text-gray-400 text-base mb-2" id="reset-success-desc">
-                Tu contraseña ha sido restablecida exitosamente.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Serás redirigido al login en unos segundos...
-              </p>
-            </div>
-
-            <button
-              onClick={handleGoToLogin}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              Ir al Login Ahora
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-meeting5 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden">
         <div className="p-8">
           <div className="flex justify-center mb-8">
-            <button
-              onClick={handleGoHome}
-              className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
-              aria-label="Ir a la página de inicio"
-            >
-              <CinemaLogo size='lg' />
+            {/* Logo */}
+            <div className="flex justify-center mb-4">
+              <button
+                onClick={() => navigate("/")}
+                aria-label="Ir a la página de inicio"
+                className="cursor-pointer"
+              >
+                <img src="logo.svg" className="w-28 rounded-xl" alt="Logo de meeting5" />
             </button>
           </div>
-
+          </div>
+          {/*Title*/}
           <div className="text-center mb-8">
-            <h1 className="text-white text-3xl font-bold mb-3" id="reset-password-title">Restablecer Contraseña</h1>
-            <p className="text-gray-400 text-base" id="reset-password-desc">
-              Ingresa tu nueva contraseña
-            </p>
+            <h1 className="text-black text-2xl lg:text-3xl font-bold text-shadow-lg" id="reset-password-title">Restablecer Contraseña</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6" aria-labelledby="reset-password-title">
@@ -138,7 +102,7 @@ const ResetPasswordPage: React.FC = () => {
                 required
                 disabled={isLoading}
                 aria-disabled={isLoading}
-                className="bg-white rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white border border-gray-400 rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -153,35 +117,32 @@ const ResetPasswordPage: React.FC = () => {
                 required
                 disabled={isLoading}
                 aria-disabled={isLoading}
-                className="bg-white rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white border border-gray-400 rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
             {error && (
-              <div role="alert" className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+              <div role="alert" className="bg-red-500/10 border border-red-500 rounded-lg p-3">
                 <p className="text-red-400 text-sm text-center">{error}</p>
               </div>
             )}
-
+            {success && (
+              <div role="alert" className="bg-green-500/10 border border-green-500 rounded-lg p-3">
+                <p className="text-green-400 text-sm text-center">Contraseña restablecida con éxito. Serás redirigido al inicio de sesión.</p>
+              </div>
+            )}
             <button
               type="submit"
               disabled={isLoading || !token}
               aria-disabled={isLoading || !token}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full bg-[#1D4ED8] hover:bg-[#1943B8] text-xl text-white font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isLoading ? "Restableciendo..." : "Restablecer Contraseña"}
             </button>
           </form>
 
-          <div className="flex justify-center mt-8">
-            <button 
-              onClick={handleGoToLogin}
-              disabled={isLoading}
-              aria-disabled={isLoading}
-              className="text-blue-400 hover:text-blue-500 font-medium transition-colors disabled:opacity-50"
-            >
-              Volver al inicio de sesión
-            </button>
+          <div className="text-center mt-8 text-gray-400 text-sm">
+            Sera redirigido a la pagina de login una vez confirme la contraseña
           </div>
         </div>
       </div>
