@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useUser } from "../context/UserContext";
-import type { PropsAuth } from "../schemas/auth";
+import { PropsAuth } from "../schemas/auth";
 
 export const Login: React.FC<PropsAuth> = ({auth, setAuth}) => {
   const navigate = useNavigate();
