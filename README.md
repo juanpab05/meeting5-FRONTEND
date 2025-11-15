@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# CINEMA-SPACE-FRONTEND
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🧭 Descripción general
+Cinema Space es una aplicación web desarrollada con **React + TypeScript + TailwindCSS + Vite**, cuyo propósito es ofrecer una experiencia moderna para explorar, registrar y gestionar información relacionada con películas y usuarios.
 
-Currently, two official plugins are available:
+La aplicación está organizada modularmente para mantener un flujo claro y escalable entre los componentes, páginas y servicios API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+## 🌐 Mapa del sitio (FooterNavbar)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+El componente `FooterNavbar` define el mapa del sitio visible en el pie de página de la aplicación.  
+Incluye enlaces de navegación hacia las secciones principales del sitio:
 
-## Expanding the ESLint configuration
+| Ruta | Descripción |
+|------|--------------|
+| `/home` | Página principal de la aplicación |
+| `/sign-in` | Página de inicio de sesión |
+| `/sign-up` | Página de creación de cuenta |
+| `/recover-password` | Recuperación de contraseña |
+| `/about-us` | Página informativa "Sobre nosotros" |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ⚙️ Flujo general
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Inicio (`/home`)**  
+   El usuario accede al catálogo principal de películas.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2. **Autenticación**
+   - `/sign-in`: Permite iniciar sesión con correo y contraseña.  
+   - `/sign-up`: Permite crear una nueva cuenta de usuario.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+3. **Gestión de cuenta**
+   - `/recover-password`: Envío de enlace para restablecer la contraseña.  
+   - `/reset-password`: Pantalla para definir una nueva contraseña.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+4. **Perfil de usuario**
+   - `/profile`: Visualización de la información personal y opciones de configuración.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+5. **Información general**
+   - `/about-us`: Sección donde se describe el proyecto y su propósito.
+
+---
+
+## 🧩 Tecnologías principales
+
+- **React 18 + TypeScript** → Base del frontend  
+- **Vite** → Bundler rápido para desarrollo  
+- **TailwindCSS** → Estilos utilitarios  
+- **React Router** → Sistema de rutas  
+- **Lucide Icons** → Iconografía  
+- **Zod / Yup (opcional)** → Validaciones de esquemas
+
+---
+
+## 🚀 Ejecución del proyecto
+
+```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar en modo desarrollo
+npm run dev
+
+# Compilar para producción
+npm run build
