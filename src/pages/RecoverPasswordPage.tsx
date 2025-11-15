@@ -33,7 +33,7 @@ export const RecoverPassword: React.FC = () => {
         setErrorMessage(data.message || "No se pudo enviar el correo. Intenta más tarde.");
       }
     } catch (error: any) {
-      setErrorMessage("Ocurrió un error en el servidor. Inténtalo más tarde.");
+      setErrorMessage("Ocurrió un error en el servidor. Comprueba la conexion");
       console.error("RecoverPassword error:", error);
     } finally {
       setLoading(false);
@@ -48,30 +48,26 @@ export const RecoverPassword: React.FC = () => {
     navigate("/sign-in");
   };
 
-  const handleGoHome = () => {
-    navigate("/home");
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-meeting5 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden">
         <div className="p-8">
           {/* Logo */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-4">
             <button
-              onClick={handleGoHome}
-              className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate("/")}
               aria-label="Ir a la página de inicio"
+              className="cursor-pointer"
             >
-              <CinemaLogo size="w-32 h-32"/>
+                <img src="logo.svg" className="w-28 rounded-xl" alt="Logo de meeting5" />
             </button>
           </div>
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-white text-3xl font-bold mb-3" id="recover-password-title">Recuperar contraseña</h1>
+            <h1 className="text-black text-2xl lg:text-3xl font-bold text-shadow-lg" id="recover-password-title">Recuperar contraseña</h1>
             <p className="text-gray-400 text-base" id="recover-password-desc">
-              Ingresa tu correo para recibir las instrucciones de recuperación
+              Recibe un enlace para restablecer tu contraseña
             </p>
           </div>
 
@@ -88,7 +84,7 @@ export const RecoverPassword: React.FC = () => {
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="bg-white rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white border border-gray-400 rounded-xl h-12 px-5 text-base placeholder-gray-400 outline-none w-full focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-disabled={loading}
               />
             </div>
@@ -108,13 +104,14 @@ export const RecoverPassword: React.FC = () => {
             )}
 
             {/* Submit button */}
+            <p className="text-gray-400 text-center text-sm mb-2">Te enviaremos un enlace para restablecer tu contraseña</p>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full bg-[#1D4ED8] hover:bg-[#1943B8] text-xl text-white font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               aria-disabled={loading}
             >
-              {loading ? "Enviando..." : "Enviar instrucciones"}
+              {loading ? "Enviando..." : "Enviar"}
             </button>
           </form>
 
@@ -123,7 +120,7 @@ export const RecoverPassword: React.FC = () => {
             <button 
               onClick={handleBackToLogin}
               disabled={loading}
-              className="text-blue-400 hover:text-blue-500 font-medium transition-colors disabled:opacity-50"
+              className="text-gray-400 hover:text-blue-500 font-medium transition-colors disabled:opacity-50"
               aria-disabled={loading}
             >
               Volver al inicio de sesión

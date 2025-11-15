@@ -1,6 +1,6 @@
 import NavbarMobile from "./NavBarMobile";
 import CinemaLogo from "./CinemaLogo";
-import Login from "./Login";
+import Login from "./HeaderButtons";
 import { PropsAuth } from "../schemas/auth";
 import React from "react";
 
