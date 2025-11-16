@@ -9,38 +9,40 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="mt-16 flex flex-col w-screen justify-center items-center bg-meeting5">
+    <div className="mt-16 flex flex-col w-full justify-center items-center bg-meeting5 overflow-x-hidden">
       {/*Seccion inicial*/}  
-      <div className="w-full h-screen overflow-y-auto p-5">
+      <div className="flex w-full h-screen justify-center items-center p-8">
         <div
-            className="flex gap-10 p-10 items-center justify-center rounded-lg w-full h-full overflow-hidden bg-white shadow-md"
+            className="flex flex-col md:flex-row p-5 md:px-15 md:py-10 items-center justify-center rounded-lg w-full h-full bg-white shadow-md"
             role="banner"
             aria-label="Pagina inicial de meeting5"
         >
-          <div className="flex items-center justify-center w-full h-full text-center">
-              <text className="landing-main-text text-left text-black text-5l md:text-5xl font-medium text-shadow-lg">
+            <div className="flex items-center justify-center w-full md:w-1/2 h-full min-w-0">
+              <p className="landing-main-text text-center text-black text-5l md:text-5xl font-medium text-shadow-lg break-words">
               Te ayudamos a 
               <span className="main-blue-meeting5 text-shadow-lg"> conectar </span> 
               con tus
               <span className="main-blue-meeting5 text-shadow-lg"> amigos y familiares  </span> 
               a distancia.
-              </text>
+              </p>
           </div>
 
-          <div className="flex items-center justify-center w-full h-full">
-              <img className="mt-20 rounded-lg w-1/4" src="videollamadas2.jpg" alt="Mujer realizando una videollamada" />
-              <img className="rounded-lg w-1/2" src="videollamadas1.jpeg" alt="Hombre mayor realizando una videollamada" />
+            <div className="flex items-center justify-center md:justify-end w-full h-full flex-wrap min-w-0">
+              <img className="md:mt-20 rounded-lg w-60 max-w-full shadow-lg" src="videollamadas2.jpg" alt="Mujer realizando una videollamada" />
+              <img className="md:mb-20 rounded-lg w-120 max-w-full shadow-lg" src="videollamadas1.jpeg" alt="Hombre mayor realizando una videollamada" />
           </div>
 
         </div>
       </div>
+      
         {/*Seccion Sobre nosotros*/}
         <div id="about-us" className="flex flex-col justify-center items-center gap-5">
           <div className="flex w-screen h-full justify-center bg-main-blue-meeting5 p-5">
             <h1 className="text-3xl font-semibold text-white text-shadow-lg">Sobre nosotros</h1>
           </div>
-          <div className="flex flex-col w-screen justify-center items-center gap-10 p-5">
 
+            <div className="flex flex-col w-full justify-center items-center gap-10 p-5 min-w-0">
+            
             <div className="justify-center items-center rounded-lg p-5 bg-white shadow-md">
               <p className="text-lg text-center text-black max-w-4xl">
                 Somos un pequeño grupo de 

@@ -5,10 +5,6 @@ export type UserData = {
   age: number;
   email: string;
   password: string;
-  profilePicture?: {
-    profilePictureURL: string;
-    profilePictureID: string;
-  }
   createdAt?: Date;
   updatedAt?: Date;
 };
