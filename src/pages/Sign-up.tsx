@@ -4,7 +4,6 @@ import { fetchRegisterUser } from "../api/user";
 
 export const SignUP: React.FC = () => {
   const [formulario, setFormulario] = useState({ name: "", surname: "", age: 0, email: "", password: "", confirmPassword: "" });
-  const [showMessage, setShowMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -17,10 +16,14 @@ export const SignUP: React.FC = () => {
     e.preventDefault();
 
     setErrorMessage("");
-    setShowMessage(false);
+    
+    if (formulario.age <= 0 || isNaN(formulario.age)) {
+      setErrorMessage("Por favor, ingresa una edad válida.");
+      return;
+    }
 
     if (formulario.password.length < 8) {
-      setShowMessage(true);
+      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
       return;
     }
 
@@ -142,11 +145,6 @@ export const SignUP: React.FC = () => {
                   onChange={handleChange}
                 />
 
-                {showMessage && (
-                  <p className="mb-2 text-white" role="alert">
-                    La contraseña debe tener al menos 8 caracteres
-                  </p>
-                )}
 
                 <label htmlFor="confirmPassword" className="sr-only">Confirmar contraseña</label>
                 <input

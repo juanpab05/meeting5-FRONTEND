@@ -117,7 +117,7 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
 
 
       {/* Pie de página */}
-      <Footer auth={isAuth} aria-label="Pie de página" />
+      <Footer aria-label="Pie de página" />
     </>
   );
 };
