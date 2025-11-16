@@ -177,12 +177,11 @@ export const SignUP: React.FC = () => {
           )}
 
           <div className="flex flex-wrap justify-center gap-2 mt-6 mb-10 text-sm text-gray-500">
-            ¿Ya tienes una cuenta?
             <button
               onClick={() => navigate("/sign-in")}
-              className="text-blue-400 hover:text-blue-500 cursor-pointer"
+              className="text-gray-500 hover:text-blue-500 text-sm transition-colors disabled:opacity-50"
             >
-              Iniciar sesión
+              ¿Ya tienes una cuenta? Inicia sesión
             </button>
           </div>
           </div>
