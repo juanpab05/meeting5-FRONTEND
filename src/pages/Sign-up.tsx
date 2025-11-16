@@ -1,11 +1,9 @@
 import { useNavigate } from "react-router";
-import { CinemaLogo } from "../components/CinemaLogo";
 import { useState } from "react";
 import { fetchRegisterUser } from "../api/user";
 
 export const SignUP: React.FC = () => {
   const [formulario, setFormulario] = useState({ name: "", surname: "", age: 0, email: "", password: "", confirmPassword: "" });
-  const [showMessage, setShowMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -18,10 +16,14 @@ export const SignUP: React.FC = () => {
     e.preventDefault();
 
     setErrorMessage("");
-    setShowMessage(false);
+    
+    if (formulario.age <= 0 || isNaN(formulario.age)) {
+      setErrorMessage("Por favor, ingresa una edad válida.");
+      return;
+    }
 
     if (formulario.password.length < 8) {
-      setShowMessage(true);
+      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
       return;
     }
 
@@ -82,43 +84,43 @@ export const SignUP: React.FC = () => {
             onSubmit={handleSubmit}
             method="POST"
             className="grid grid-cols-1 gap-4 w-full"
-          >        
-              <div className="flex flex-col w-full">
+          >
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col w-full gap-2">
                 <label htmlFor="name" className="sr-only">Nombres</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formulario.name}
-                  placeholder="Ingrese el nombre"
+                  placeholder="Nombres"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
+
                 <label htmlFor="surname" className="sr-only">Apellidos</label>
                 <input
                   type="text"
                   id="surname"
                   name="surname"
                   value={formulario.surname}
-                  placeholder="Ingrese el apellido"
+                  placeholder="Apellidos"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-
                 <label htmlFor="age" className="sr-only">Edad</label>
                 <input
-                  type="integer"
+                  type="text"
                   id="age"
                   name="age"
-                  value={formulario.surname}
-                  placeholder="Ingrese la edad"
+                  value={formulario.age}
+                  placeholder="Edad"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-
                 <label htmlFor="email" className="sr-only">Correo electrónico</label>
                 <input
                   type="email"
@@ -143,11 +145,6 @@ export const SignUP: React.FC = () => {
                   onChange={handleChange}
                 />
 
-                {showMessage && (
-                  <p className="mb-2 text-white" role="alert">
-                    La contraseña debe tener al menos 8 caracteres
-                  </p>
-                )}
 
                 <label htmlFor="confirmPassword" className="sr-only">Confirmar contraseña</label>
                 <input
@@ -160,7 +157,7 @@ export const SignUP: React.FC = () => {
                   className="mb-3 bg-white rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-
+              </div>
             </div>
 
             <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
@@ -180,12 +177,11 @@ export const SignUP: React.FC = () => {
           )}
 
           <div className="flex flex-wrap justify-center gap-2 mt-6 mb-10 text-sm text-gray-500">
-            ¿Ya tienes una cuenta?
             <button
               onClick={() => navigate("/sign-in")}
-              className="text-blue-400 hover:text-blue-500 cursor-pointer"
+              className="text-gray-500 hover:text-blue-500 text-sm transition-colors disabled:opacity-50"
             >
-              Iniciar sesión
+              ¿Ya tienes una cuenta? Inicia sesión
             </button>
           </div>
           </div>
