@@ -1,5 +1,4 @@
 import NavbarMobile from "./NavBarMobile";
-import CinemaLogo from "./CinemaLogo";
 import Login from "./HeaderButtons";
 import { PropsAuth } from "../schemas/auth";
 import React from "react";
@@ -25,7 +24,7 @@ export const HeaderMobile: React.FC<PropsAuth> = ({auth, setAuth}) => {
           sm:gap-2 sm:justify-between 
         "
       >
-        <CinemaLogo size="w-21 h-21" />
+        {/*<CinemaLogo size="w-21 h-21" />*/}
         <span
           className={`
             text-lg hidden font-semibold
@@ -33,7 +32,7 @@ export const HeaderMobile: React.FC<PropsAuth> = ({auth, setAuth}) => {
             md:block
           `}
         >
-          Cinema Space
+          Meeting5
         </span>
       </div>
 

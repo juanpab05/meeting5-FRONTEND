@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { getToken } from "../api/utils";
 import { ListIcon } from "lucide-react";
-import CinemaLogo from "./CinemaLogo";
 
 export const NavbarMobile: React.FC<{isAuth?: boolean}> = ({isAuth}) => {
   const hover = "hover:text-red-500 transition-500 duration-200"
@@ -44,7 +43,7 @@ export const NavbarMobile: React.FC<{isAuth?: boolean}> = ({isAuth}) => {
         flex flex-col items-center pt-4
         `}
       >
-        <CinemaLogo/>
+        {/*<CinemaLogo/>*/}
         <nav 
         className="
         h-full mt-[5vh] w-full 

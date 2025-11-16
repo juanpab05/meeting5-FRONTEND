@@ -32,13 +32,13 @@ export const LoginPage = () => {
       if (data.token) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
-        
+        console.log("Login exitoso:", localStorage.getItem('token'));
         refreshUser();
       }
 
       setFormulario({ email: "", password: "" })
       
-      navigate("/home");
+      navigate("/create-meet");
         
     } catch (error: any) {
       console.error('Error en login:', error)

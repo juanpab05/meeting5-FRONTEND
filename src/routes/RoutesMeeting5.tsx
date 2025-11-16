@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import LandingPage from "../pages/LandingPage.tsx";
-import HomePage from "../pages/HomePage.tsx";
-import AboutPage from "../pages/AboutPage.tsx";
 import SignUP from "../pages/Sign-up.tsx";
 import RecoverPassword from "../pages/RecoverPasswordPage.tsx";
 import ResetPasswordPage from "../pages/ResetPasswordPage.tsx";
@@ -27,7 +25,6 @@ const RoutesMeeting5 = () => {
           <Route path="/sign-up" element={<SignUP />} />
           <Route path="/recover-password" element={<RecoverPassword />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/home" element={<HomePage />} />
           <Route path="/sign-in" element={<LoginPage />} />
           <Route path="/profile" element={<UserProfile />} />
         </Routes>
