@@ -86,14 +86,6 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
               "
           > Registrarse </button>
 
-          <button
-            type="button"
-            onClick={() => navigate("/create-meet")}
-            className="
-              button-blue2-meeting5 hover:bg-gray-300 text-black font-semibold 
-              px-4 py-2 rounded-lg transition-colors cursor-pointer
-              "
-          > Meet </button>
         </div>
       )
       }
