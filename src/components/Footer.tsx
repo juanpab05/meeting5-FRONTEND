@@ -16,7 +16,7 @@ export const Footer = () => {
       role="contentinfo"
       aria-label="Mapa del sitio"
     >
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-col md:flex-col justify-between items-center gap-6">
+      <div className="max-w-7xl mx-auto flex flex-col justify-between items-center gap-6">
         <h1 className="text-2xl font-extrabold font-sans white text-shadow">Mapa del sitio</h1>
 
         <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-6 md:gap-12">

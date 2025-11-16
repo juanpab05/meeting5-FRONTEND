@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router";
-import { CinemaLogo } from "../components/CinemaLogo";
 import { useState } from "react";
 import { fetchRegisterUser } from "../api/user";
 
@@ -84,7 +83,7 @@ export const SignUP: React.FC = () => {
             className="grid grid-cols-1 gap-4 w-full"
           >
             <div className="flex flex-col gap-6">
-              <div className="flex flex-col w-full">
+              <div className="flex flex-col w-full gap-2">
                 <label htmlFor="name" className="sr-only">Nombres</label>
                 <input
                   type="text"
@@ -108,9 +107,17 @@ export const SignUP: React.FC = () => {
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-              </div>
-
-              <div className="flex flex-col w-full">
+                <label htmlFor="age" className="sr-only">Edad</label>
+                <input
+                  type="text"
+                  id="age"
+                  name="age"
+                  value={formulario.age}
+                  placeholder="Edad"
+                  required
+                  className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  onChange={handleChange}
+                />
                 <label htmlFor="email" className="sr-only">Correo electrónico</label>
                 <input
                   type="email"
