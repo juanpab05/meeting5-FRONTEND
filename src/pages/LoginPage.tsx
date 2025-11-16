@@ -111,7 +111,7 @@ export const LoginPage = () => {
                 placeholder="Contraseña"
                 required
                 disabled={isLoading}
-                className="w-full px-3 py-3 border border-gray-400 rounded-xl dark:bg-gray-700 placeholder-gray-500 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-3 border border-gray-400 rounded-xl dark:bg-gray-700 placeholder-gray-500 text-black dark:text-black focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 onChange={handleChange}
               />
               <button

@@ -82,8 +82,7 @@ export const SignUP: React.FC = () => {
             onSubmit={handleSubmit}
             method="POST"
             className="grid grid-cols-1 gap-4 w-full"
-          >
-            <div className="flex flex-col gap-6">
+          >        
               <div className="flex flex-col w-full">
                 <label htmlFor="name" className="sr-only">Nombres</label>
                 <input
@@ -91,26 +90,35 @@ export const SignUP: React.FC = () => {
                   id="name"
                   name="name"
                   value={formulario.name}
-                  placeholder="Nombres"
+                  placeholder="Ingrese el nombre"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-
                 <label htmlFor="surname" className="sr-only">Apellidos</label>
                 <input
                   type="text"
                   id="surname"
                   name="surname"
                   value={formulario.surname}
-                  placeholder="Apellidos"
+                  placeholder="Ingrese el apellido"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-              </div>
 
-              <div className="flex flex-col w-full">
+                <label htmlFor="age" className="sr-only">Edad</label>
+                <input
+                  type="integer"
+                  id="age"
+                  name="age"
+                  value={formulario.surname}
+                  placeholder="Ingrese la edad"
+                  required
+                  className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  onChange={handleChange}
+                />
+
                 <label htmlFor="email" className="sr-only">Correo electrónico</label>
                 <input
                   type="email"
@@ -152,7 +160,7 @@ export const SignUP: React.FC = () => {
                   className="mb-3 bg-white rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-              </div>
+
             </div>
 
             <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
