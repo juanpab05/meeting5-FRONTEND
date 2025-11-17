@@ -62,7 +62,7 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
       {!auth && (
         <div
           className="
-            flex flex-col gap-2
+            flex flex-row gap-2
             sm:flex-row sm:gap-4
             "
         >
@@ -72,19 +72,27 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
             className="
               button-blue1-meeting5 hover:bg-red-700 
               text-white font-semibold 
-              px-4 py-2 rounded-lg transition-colors
-              cursor-pointer
+              px-2 py-1 text-sm rounded-md
+              sm:px-4 sm:py-2 sm:text-base sm:rounded-lg
+              transition-colors cursor-pointer
               "
-          > Iniciar sesión </button>
+            >
+            Iniciar sesión
+          </button>
 
           <button
-            type="button"
-            onClick={() => navigate("/sign-up")}
-            className="
-              button-blue2-meeting5 hover:bg-gray-300 text-black font-semibold 
-              px-4 py-2 rounded-lg transition-colors cursor-pointer
-              "
-          > Registrarse </button>
+              type="button"
+              onClick={() => navigate("/sign-up")}
+              className="
+                button-blue2-meeting5 hover:bg-gray-300 text-black font-semibold 
+                px-2 py-1 text-sm rounded-md
+                sm:px-4 sm:py-2 sm:text-base sm:rounded-lg
+                transition-colors cursor-pointer
+                "
+              >
+              Registrarse
+          </button>
+
 
         </div>
       )
@@ -93,7 +101,7 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
       {auth && localStorage.getItem("token") && (
         <div
           className="
-            flex flex-col gap-2
+            flex flex-row gap-2
             sm:flex-row sm:gap-4
             "
         >
@@ -119,7 +127,7 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
               "
           > Ver perfil </button>
 
-          <button
+          {/* <button
             type="button"
             onClick={() => {
               handleLogout()
@@ -128,7 +136,7 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
               button-blue2-meeting5 shadow-lg hover:bg-gray-300 text-black font-semibold 
               px-4 py-2 rounded-lg transition-colors cursor-pointer
               "
-          > Cerrar sesión </button>
+          > Cerrar sesión </button> */}
         </div>
       )
       }
