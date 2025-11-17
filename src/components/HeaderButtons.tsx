@@ -10,7 +10,7 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
   const { user, guestUser, setUser, loadingUser, refreshUser } = useUser();
 
   useEffect(() => {
-    if (auth && !loadingUser && !user?.name) {
+    if (auth && !loadingUser && !user?.firstName) {
       const interval = setInterval(async () => {
         await refreshUser();
       }, 100);
