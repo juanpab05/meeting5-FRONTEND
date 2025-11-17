@@ -5,16 +5,41 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Card } from "../ui/card";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export function QuickMeeting() {
   const [copied, setCopied] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
+  const navigate = useNavigate();
 
-  const generateMeetingLink = () => {
-    const randomId = Math.random().toString(36).substring(2, 12);
-    const link = `https://meet.example.com/${randomId}`;
-    setGeneratedLink(link);
-    toast.success("Enlace de reunión generado exitosamente");
+  const generateMeetingLink = async () => {
+    try {
+      const now = new Date().toISOString();
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/meetings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          title: "AUTO_GENERATE",
+          scheduledAt: now,
+          participants: []
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        toast.success("Enlace de reunión generado exitosamente");
+        // navegar directamente al meet
+        navigate(`/meeting/${data.data.id}`);
+      } else {
+        toast.error(data.message || "Error al crear la reunión");
+      }
+    } catch (error) {
+      toast.error("Error de conexión con el servidor");
+    }
   };
 
   const copyToClipboard = async () => {

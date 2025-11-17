@@ -25,7 +25,7 @@ export function WelcomeBanner() {
   ];
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-[#2563EB] to-[#1E40AF] rounded-2xl p-8 md:p-12 mb-8 shadow-lg">
+    <div className="relative overflow-hidden bg-gradient-to-br from-[#2563EB] to-[#1E40AF] rounded-2xl p-15 md:p-12 mb-8 mt-16 shadow-lg">
       {/* Decorative circles */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-[#60A5FA] rounded-full opacity-10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#60A5FA] rounded-full opacity-10 blur-3xl translate-y-1/2 -translate-x-1/2"></div>

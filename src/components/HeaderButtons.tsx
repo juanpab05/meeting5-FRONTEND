@@ -9,13 +9,10 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, guestUser, setUser, loadingUser, refreshUser } = useUser();
 
+  // ✅ Refrescar usuario solo una vez, no con intervalos
   useEffect(() => {
-    if (auth && !loadingUser && !user?.name) {
-      const interval = setInterval(async () => {
-        await refreshUser();
-      }, 100);
-
-      return () => clearInterval(interval);
+    if (auth && !loadingUser && !user?.firstName) {
+      refreshUser(); // 👈 solo se llama una vez
     }
   }, [auth, user, loadingUser, refreshUser]);
 

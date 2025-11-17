@@ -4,7 +4,7 @@ export function UserProfilePage() {
   return (
     <div className="min-h-screen bg-[#F5F7FA] p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-8 mt-16">
           <h1 className="text-[#1F2937] mb-2">Mi Perfil</h1>
           <p className="text-[#1F2937]/60">Administra tu cuenta y configuración de seguridad</p>
         </div>
