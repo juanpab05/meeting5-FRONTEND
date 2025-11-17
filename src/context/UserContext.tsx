@@ -16,15 +16,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const guestUser = ({
   _id:"guest",
-  name: "guest",
-  surname: "",
+  firstName: "guest",
+  lastName: "",
   age: 0,
   email: "",
   password: "",
-  profilePicture: {
-    profilePictureURL: "",
-    profilePictureID: ""
-  },
   createdAt: new Date(),
   updatedAt: new Date()
   });
