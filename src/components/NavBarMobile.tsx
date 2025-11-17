@@ -104,9 +104,9 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
           </div>
 
           <div className={fila}>
-                <Link to="#sitemap" onClick={() => setIsOpen(false)}>
-                  <span className={hover}>Mapa del sitio</span>
-                </Link>
+              <Link to="#sitemap" onClick={() => setIsOpen(false)}>
+                <span className={hover}>Mapa del sitio</span>
+              </Link>
           </div>
         </nav>
       </div>

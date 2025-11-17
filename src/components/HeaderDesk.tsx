@@ -1,10 +1,13 @@
 import HeaderButtons from "./HeaderButtons";
 import { PropsAuth } from "../schemas/auth";
 import React from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+
+
 
 export const Header: React.FC<PropsAuth> = ({ auth, setAuth }) => {
-    const hover = "hover:text-black focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200";
+    const navigate = useNavigate();
+    const hover = "hover:text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200";
   return (
     <header
       className="
@@ -18,7 +21,13 @@ export const Header: React.FC<PropsAuth> = ({ auth, setAuth }) => {
       {/* Meeting5 logo */}
       <div
         className="p-2 flex items-center sm:gap-2 sm:justify-between">
+         <button
+              onClick={() => navigate("/")}
+              aria-label="Ir a la página de inicio"
+              className="cursor-pointer"
+            >
         <img className="w-16 h-auto rounded-lg" src="logo.svg" alt="Logo de meeting5"/>
+        </button>
         <h1 className="text-lg font-semibold font-sans ml-2">meeting5</h1>
       </div>
 
