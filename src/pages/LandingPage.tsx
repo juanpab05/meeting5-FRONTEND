@@ -62,7 +62,7 @@ export const LandingPage: React.FC = () => {
                 <h1 className="main-blue-meeting5 font-semibold">Daniel Trujillo:
                   <span className="text-black font-normal"> Frontend Dev</span>
                 </h1>
-                <h1 className="main-blue-meeting5 font-semibold">Samuel Cordoba:
+                <h1 className="main-blue-meeting5 font-semibold">Esteban Cordoba:
                   <span className="text-black font-normal"> Frontend Developer</span>
                 </h1>
                 <h1 className="main-blue-meeting5 font-semibold">Juan Sebastian:
