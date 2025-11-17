@@ -19,8 +19,8 @@ export const HeaderMobile: React.FC<PropsAuth> = ({ auth, setAuth }) => {
       {/* === LEFT SIDE: LOGO + TEXT === */}
       <div className="flex items-center gap-2">
         {/* ICONO (pon el tuyo aquí) */}
-        <div className="w-8 h-8 bg-white/20 rounded-md flex items-center justify-center">
-          📹
+        <div className="w-8 h-8 flex items-center justify-center">
+          <img className="w-auto h-full rounded-lg" src="logo.svg" alt="Logo de meeting5"/>
         </div>
 
         {/* TEXTO DEL LOGO */}
