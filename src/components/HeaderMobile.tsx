@@ -20,7 +20,7 @@ export const HeaderMobile: React.FC<PropsAuth> = ({ auth, setAuth }) => {
       <div className="flex items-center gap-2">
         {/* ICONO (pon el tuyo aquí) */}
         <div className="w-8 h-8 flex items-center justify-center">
-          <img className="w-auto h-full rounded-lg" src="logo.svg" alt="Logo de meeting5"/>
+          <img className="w-auto rounded-lg" src="logo.svg" alt="Logo de meeting5"/>
         </div>
 
         {/* TEXTO DEL LOGO */}
