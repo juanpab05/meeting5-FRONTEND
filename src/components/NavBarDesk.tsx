@@ -16,7 +16,7 @@ export const NavBarSM: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
       role="navigation"
       aria-label="Barra de navegación principal"
     >
-      <Link to="/home" aria-label="Ir a la página de inicio">
+      <Link to="/" aria-label="Ir a la página de inicio">
         <span className={hover}>Inicio</span>
       </Link>
 
