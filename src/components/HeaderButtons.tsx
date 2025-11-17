@@ -99,7 +99,7 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
         >
           <button
             type="button"
-            onClick={() => navigate("/sign-in")}
+            onClick={() => navigate("/create-meet")}
             className="
               button-green-meeting5 shadow-lg hover:bg-red-700 
               text-white font-semibold 
@@ -110,7 +110,7 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
 
           <button
             type="button"
-            onClick={() => navigate("/sign-in")}
+            onClick={() => navigate("/profile")}
             className="
               button-blue1-meeting5  shadow-md hover:bg-red-700 
               text-white font-semibold 

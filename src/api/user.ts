@@ -71,7 +71,7 @@ export async function fetchUserProfile(): Promise<any> {
       return null;
     }
 
-    const response = await fetch(`${API}/users/me`, {
+    const response = await fetch(`${API}/users/profile`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

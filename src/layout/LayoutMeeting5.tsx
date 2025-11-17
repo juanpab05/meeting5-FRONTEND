@@ -60,7 +60,7 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
 
         if (!token) {
           setIsAuth(false);
-
+          
           // Si el usuario no está en una ruta pública, redirigir a "/".
           if (!isPublicRoute(location.pathname)) navigate("/");
           return;

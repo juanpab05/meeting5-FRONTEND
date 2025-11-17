@@ -32,7 +32,6 @@ export const LoginPage = () => {
       if (data.token) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
-        console.log("Login exitoso:", localStorage.getItem('token'));
         refreshUser();
       }
 
