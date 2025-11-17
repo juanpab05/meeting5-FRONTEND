@@ -22,15 +22,22 @@ export const SignUP: React.FC = () => {
       return;
     }
 
-    if (formulario.password.length < 8) {
-      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
-      return;
-    }
 
     if (formulario.password !== formulario.confirmPassword) {
       setErrorMessage("Las contraseñas no coinciden.");
       return;
     }
+
+    if (!/[A-Z]/.test(formulario.password)) {
+      setErrorMessage("La contraseña debe contener al menos una mayúscula.");
+      return;
+    }
+
+    if (formulario.password.length < 8) {
+      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
 
     const userDataSignUP = {
       name: formulario.name,
@@ -51,8 +58,12 @@ export const SignUP: React.FC = () => {
         setErrorMessage("Los datos enviados no son válidos.");
       } else if (error.message.includes("Unauthorized")) {
         setErrorMessage("No tienes permiso para realizar esta acción.");
-      } else {
-        setErrorMessage("No se pudo registrar el usuario. Verifica tus datos.");
+      } 
+        else if (error.message.includes("Conflict")) {
+        setErrorMessage("El correo electrónico ya está registrado.");
+      }
+        else {
+        setErrorMessage("No se pudo registrar el usuario.");
       }
     }
   };

@@ -16,7 +16,7 @@ const location = process.env.NODE_ENV === "development" || window.location.hostn
  */
 export async function fetchRegisterUser(params: UserData): Promise<any> {
   try {
-    const response = await fetch(`${API}/users`, {
+    const response = await fetch(`${API}/users/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
