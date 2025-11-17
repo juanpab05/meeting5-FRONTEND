@@ -12,7 +12,6 @@ export const HeaderMobile: React.FC<PropsAuth> = ({ auth, setAuth }) => {
         shadow-md z-50 
         flex items-center justify-between
         px-4 h-16
-        sm:hidden
       "
       role="banner"
     >

@@ -53,7 +53,7 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
         ref={menuRef}
         className={`
           fixed top-0 right-0 h-full w-[70%] 
-          bg-[#2DCD71] text-white shadow-xl 
+          bg-[#2E92D9] text-white shadow-xl 
           transform transition-transform duration-300
           flex flex-col pt-10 z-[9999]
           ${isOpen ? "translate-x-0" : "translate-x-full"}
@@ -66,29 +66,30 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
             </Link>
           </div>
 
+        {!isAuth && !getToken() && (
+          <>
           <div className={fila}>
-            <Link to="/catalog" onClick={() => setIsOpen(false)}>
-              <span className={hover}>Catálogo</span>
+            <Link to="/sign-in" onClick={() => setIsOpen(false)}>
+              <span className={hover}>Iniciar sesión</span>
             </Link>
           </div>
 
-        
-      
+          <div className={fila}>
+            <Link to="/sign-up" onClick={() => setIsOpen(false)}>
+              <span className={hover}>Registrarse</span>
+            </Link>
+          </div>
+        </>)}
+
           {isAuth && getToken() && (
             <>
               <div className={fila}>
-                <Link to="/favorites" onClick={() => setIsOpen(false)}>
-                  <span className={hover}>Favoritos</span>
-                </Link>
-              </div>
-
-              <div className={fila}>
-                <Link to="/ratings" onClick={() => setIsOpen(false)}>
-                  <span className={hover}>Calificaciones</span>
+                <Link to="/profile" onClick={() => setIsOpen(false)}>
+                  <span className={hover}>Ver perfil</span>
                 </Link>
               </div>
               <div className={fila}>
-                <Link to="/logout" onClick={() => setIsOpen(false)}>
+                <Link to="/" onClick={() => setIsOpen(false)}>
                 <button onClick={handleLogout} className={hover}>
                   Cerrar sesión
                 </button>
@@ -96,6 +97,17 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
               </div>
             </>
           )}
+          <div className={fila}>
+            <Link to="/#about-us" onClick={() => setIsOpen(false)}>
+              <span className={hover}>Sobre nosotros</span>
+            </Link>
+          </div>
+
+          <div className={fila}>
+                <Link to="#sitemap" onClick={() => setIsOpen(false)}>
+                  <span className={hover}>Mapa del sitio</span>
+                </Link>
+          </div>
         </nav>
       </div>
     </div>

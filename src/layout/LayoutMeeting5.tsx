@@ -103,10 +103,10 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
       {/* Mostrar header */}
       {!shouldHideHeader && (
         <>
-          <div className="hidden sm:block" role="banner" aria-label="Encabezado de escritorio">
+          <div className="hidden md:block" role="banner" aria-label="Encabezado de escritorio">
             <Header auth={isAuth} setAuth={setIsAuth} />
           </div>
-          <div className="block sm:hidden" role="banner" aria-label="Encabezado móvil">
+          <div className="block md:hidden" role="banner" aria-label="Encabezado móvil">
             <HeaderMobile auth={isAuth} setAuth={setIsAuth} />
           </div>
         </>
