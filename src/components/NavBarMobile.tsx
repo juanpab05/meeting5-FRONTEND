@@ -50,7 +50,7 @@ export const NavbarMobile: React.FC<{isAuth?: boolean}> = ({isAuth}) => {
         "
         >
           <div className={fila}>
-            <Link to="/home" onClick={() => {setIsOpen(false)}}>
+            <Link to="/" onClick={() => {setIsOpen(false)}}>
             <span 
               className={hover}
             > Inicio</span>        

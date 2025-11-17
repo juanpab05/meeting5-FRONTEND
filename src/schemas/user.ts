@@ -1,7 +1,7 @@
 export type UserData = {
   _id?:string;
-  name: string;
-  surname: string;
+  firstName: string;
+  lastName: string;
   age: number;
   email: string;
   password: string;

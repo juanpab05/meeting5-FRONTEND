@@ -23,7 +23,7 @@ export const Footer = () => {
           <div className="flex flex-col justify-center items-center gap-2">
             <h1 className="text-lg font-semibold font-sans mb-2">Videollamadas</h1>
               <Link
-                to="/home"
+                to="/create-meet"
                 className={hover}
                 aria-label="Ir a la página principal de videollamadas"
                 >

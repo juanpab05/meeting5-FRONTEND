@@ -11,7 +11,7 @@ export const Navbar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
       role="navigation"
       aria-label="Barra de navegación principal"
     >
-      <Link to="/home" className={linkClass} aria-label="Ir a la página de inicio">
+      <Link to="/" className={linkClass} aria-label="Ir a la página de inicio">
         Inicio
       </Link>
       <Link to="/catalog" className={linkClass} aria-label="Ir al catálogo de películas">

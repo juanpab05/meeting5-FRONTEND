@@ -3,7 +3,7 @@ import { useState } from "react";
 import { fetchRegisterUser } from "../api/user";
 
 export const SignUP: React.FC = () => {
-  const [formulario, setFormulario] = useState({ name: "", surname: "", age: 0, email: "", password: "", confirmPassword: "" });
+  const [formulario, setFormulario] = useState({ firstName: "", lastName: "", age: 0, email: "", password: "", confirmPassword: "" });
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -40,8 +40,8 @@ export const SignUP: React.FC = () => {
 
 
     const userDataSignUP = {
-      name: formulario.name,
-      surname: formulario.surname,
+      firstName: formulario.firstName,
+      lastName: formulario.lastName,
       age: formulario.age,
       email: formulario.email,
       password: formulario.password,
@@ -49,8 +49,8 @@ export const SignUP: React.FC = () => {
 
     try {
       await fetchRegisterUser(userDataSignUP);
-      setFormulario({ name: "", surname: "", age: 0, email: "", password: "", confirmPassword: "" });
-      navigate("/home");
+      setFormulario({ firstName: "", lastName: "", age: 0, email: "", password: "", confirmPassword: "" });
+      navigate("/");
     } catch (error: any) {
       if (error.message.includes("Internal server error")) {
         setErrorMessage("Ocurrió un error en el servidor. Inténtalo más tarde.");
@@ -98,24 +98,24 @@ export const SignUP: React.FC = () => {
           >
             <div className="flex flex-col gap-6">
               <div className="flex flex-col w-full gap-2">
-                <label htmlFor="name" className="sr-only">Nombres</label>
+                <label htmlFor="firstName" className="sr-only">Nombres</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formulario.name}
+                  id="firstName"
+                  name="firstName"
+                  value={formulario.firstName}
                   placeholder="Nombres"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
 
-                <label htmlFor="surname" className="sr-only">Apellidos</label>
+                <label htmlFor="lastName" className="sr-only">Apellidos</label>
                 <input
                   type="text"
-                  id="surname"
-                  name="surname"
-                  value={formulario.surname}
+                  id="lastName"
+                  name="lastName"
+                  value={formulario.lastName}
                   placeholder="Apellidos"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
