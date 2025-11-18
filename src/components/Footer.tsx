@@ -2,10 +2,9 @@
 import { Link } from "react-router";
 
 /**
- * Elegant footer inspired by streaming platforms like Netflix or Crunchyroll.
  *
  * @component
- * @returns {JSX.Element} The themed footer for Cinema Space.
+ * @returns {JSX.Element} Footer 
  */
 export const Footer = () => {
   const hover = "hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200";

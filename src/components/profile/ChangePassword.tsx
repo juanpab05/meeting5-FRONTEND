@@ -173,7 +173,8 @@ export function ChangePassword() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-[#2563EB] hover:bg-[#1E40AF] text-white"
+          className="w-full bg-[#2563EB] hover:bg-[#1E40AF] text-white
+             focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
         >
           {isLoading ? "Actualizando..." : "Actualizar Contraseña"}
         </Button>

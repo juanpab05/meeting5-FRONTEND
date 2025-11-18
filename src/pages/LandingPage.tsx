@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 /**
  * LandingPage Component
  *
- * Displays the main landing section of the Cinema Space application.
  */
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
