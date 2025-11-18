@@ -3,41 +3,39 @@ import Login from "./HeaderButtons";
 import { PropsAuth } from "../schemas/auth";
 import React from "react";
 
-export const HeaderMobile: React.FC<PropsAuth> = ({auth, setAuth}) => {
-  return(
+export const HeaderMobile: React.FC<PropsAuth> = ({ auth, setAuth }) => {
+  return (
     <header
       className="
-        fixed top-0 left-0 w-full bg-black text-white
-        shadow-md border-b border-gray-800 z-50
-        flex justify-between sm:hidden
+        fixed top-0 left-0 w-full 
+        bg-blue-600 text-white 
+        shadow-md z-50 
+        flex items-center justify-between
+        px-4 h-16
       "
       role="banner"
-      aria-label="Encabezado móvil de Cinema Space"
     >
-      {/** === NAV === */}
-      <NavbarMobile isAuth={auth} />
+      {/* === LEFT SIDE: LOGO + TEXT === */}
+      <div className="flex items-center gap-2">
+        {/* ICONO (pon el tuyo aquí) */}
+        <div className="w-10 h-10 flex items-center justify-center">
+          <img className="w-auto rounded-lg" src="logo.svg" alt="Logo de meeting5"/>
+        </div>
 
-      {/* === LOGO === */}
-      <div
-        className="
-          p-2 flex items-center
-          sm:gap-2 sm:justify-between 
-        "
-      >
-        {/*<CinemaLogo size="w-21 h-21" />*/}
-        <span
-          className={`
-            text-lg hidden font-semibold
-            sm:ml-2 sm:${auth ? "hidden" : "block"}
-            md:block
-          `}
-        >
-          Meeting5
+        {/* TEXTO DEL LOGO */}
+        <span className="text-xl font-semibold tracking-wide">
+          meeting5
         </span>
       </div>
 
-      {/** === LOGIN === */}
-      <Login auth={auth} setAuth={setAuth} />
+      {/* === RIGHT SIDE: BUTTONS === */}
+      <div className="flex items-center gap-3">
+        {/* Botón iniciar sesión */}
+        <Login auth={auth} setAuth={setAuth} />
+
+        {/* Menú hamburguesa */}
+        <NavbarMobile isAuth={auth} />
+      </div>
     </header>
   );
 };

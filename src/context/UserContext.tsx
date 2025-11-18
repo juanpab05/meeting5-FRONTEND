@@ -14,16 +14,16 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const guestUser: UserData = {
-    _id: "guest",
-    firstName: "guest",   // 👈 usa firstName
-    lastName: "",         // 👈 usa lastName
-    age: 0,
-    email: "",
-    password: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
+  const guestUser = ({
+  _id:"guest",
+  firstName: "guest",
+  lastName: "",
+  age: 0,
+  email: "",
+  password: "",
+  createdAt: new Date(),
+  updatedAt: new Date()
+  });
 
   const [user, setUser] = useState<UserData | null>(guestUser);
   const [loadingUser, setLoadingUser] = useState(true);
