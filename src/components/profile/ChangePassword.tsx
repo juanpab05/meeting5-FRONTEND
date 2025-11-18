@@ -5,6 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
 import React from "react";
+import { fetchChangePassword } from "../../api/user";
 
 export function ChangePassword() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -15,30 +16,47 @@ export function ChangePassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const validatePassword = (password: string) => {
+    if (password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
+    if (!/[A-Z]/.test(password)) return "La contraseña debe contener al menos una mayúscula.";
+    if (!/[0-9]/.test(password)) return "La contraseña debe contener al menos un número.";
+    if (!/[^A-Za-z0-9]/.test(password)) return "La contraseña debe contener al menos un símbolo.";
+    return null;
+  };
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
       toast.error("Las contraseñas no coinciden");
       return;
     }
 
-    if (newPassword.length < 8) {
-      toast.error("La contraseña debe tener al menos 8 caracteres");
+    const error = validatePassword(newPassword);
+    if (error) {
+      toast.error(error);
       return;
     }
 
     setIsLoading(true);
-    
-    // Simulación de cambio de contraseña
-    setTimeout(() => {
+
+    try {
+      const response = await fetchChangePassword(currentPassword, newPassword);
+
+      if (response.success) {
+        toast.success("Contraseña actualizada correctamente ✅");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Error al cambiar la contraseña");
+    } finally {
       setIsLoading(false);
-      toast.success("Contraseña actualizada correctamente");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    }, 1500);
+    }
   };
+
 
   const passwordStrength = (password: string) => {
     if (password.length === 0) return { strength: 0, label: "" };

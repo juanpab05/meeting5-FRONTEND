@@ -6,6 +6,9 @@ import { Label } from "../components/ui/label";
 import { toast } from "sonner";
 import React from "react";
 
+// 👇 Importamos la función desde reset-password.ts
+import { fetchRecoverPassword } from "../api/reset-password";
+
 export function RecoverPassword() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -21,11 +24,22 @@ export function RecoverPassword() {
 
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      // 👇 Usamos la función centralizada
+      const data = await fetchRecoverPassword(email);
+
+      if (data.success) {
+        setEmailSent(true);
+        toast.success(data.message);
+      } else {
+        toast.error(data.message || "No se pudo enviar el correo de recuperación");
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Error al enviar el correo de recuperación");
+    } finally {
       setIsLoading(false);
-      setEmailSent(true);
-      toast.success("Correo de recuperación enviado");
-    }, 1500);
+    }
   };
 
   return (

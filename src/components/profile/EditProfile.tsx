@@ -1,20 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserCircle, Save } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
 import React from "react";
+import { useUser } from "../../context/UserContext";
+import { fetchUpdateUserProfile } from "../../api/user";
 
 export function EditProfile() {
-  const [formData, setFormData] = useState({
-    firstName: "Juan",
-    lastName: "Pérez",
-    age: "28",
-    email: "juan.perez@ejemplo.com",
+  const { user, refreshUser } = useUser();
+  const [formData, setFormData] = useState(() => ({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    age: user?.age?.toString() || "",
+    email: user?.email || "",
     password: "••••••••"
-  });
+  }));
+
   const [isLoading, setIsLoading] = useState(false);
+  const [updated, setUpdated] = useState(false); // 👈 flag para controlar actualización
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -23,9 +28,23 @@ export function EditProfile() {
     }));
   };
 
+  // 👇 Solo sincroniza el formulario cuando realmente se actualizó el perfil
+  useEffect(() => {
+    if (user && updated) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        age: user.age?.toString() || "",
+        email: user.email || "",
+        password: "••••••••"
+      });
+      setUpdated(false); // reset flag
+    }
+  }, [user, updated]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validaciones
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       toast.error("Nombres y apellidos son obligatorios");
@@ -44,12 +63,25 @@ export function EditProfile() {
     }
 
     setIsLoading(true);
-    
-    // Simulación de actualización de perfil
-    setTimeout(() => {
+    try {
+      await fetchUpdateUserProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        age: formData.age ? age : undefined,
+        email: formData.email,
+      });
+
+      toast.success("Perfil actualizado correctamente ✅");
+
+      // refrescar datos en el contexto
+      await refreshUser();
+      setUpdated(true); // 👈 activa el flag para que el useEffect sincronice
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Error al actualizar el perfil");
+    } finally {
       setIsLoading(false);
-      toast.success("Perfil actualizado correctamente");
-    }, 1500);
+    }
   };
 
   return (
@@ -148,10 +180,10 @@ export function EditProfile() {
             variant="outline"
             onClick={() => {
               setFormData({
-                firstName: "Juan",
-                lastName: "Pérez",
-                age: "28",
-                email: "juan.perez@ejemplo.com",
+                firstName: user?.firstName || "",
+                lastName: user?.lastName || "",
+                age: user?.age?.toString() || "",
+                email: user?.email || "",
                 password: "••••••••"
               });
               toast.info("Cambios descartados");

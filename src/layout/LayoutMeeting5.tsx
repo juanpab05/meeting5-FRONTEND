@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Footer from "../components/Footer.tsx";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router-dom"; // 👈 usa react-router-dom
 import { getToken } from "../api/utils.ts";
 import Header from "../components/HeaderDesk.tsx";
 import { useUser } from "../context/UserContext.tsx";
@@ -18,9 +18,14 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
   const { user } = useUser();
 
   /**
-   * Rutas donde el encabezado no debe mostrarse.
+   * Rutas donde el encabezado y el footer no deben mostrarse.
    */
-  const noHeaderRoutes = ["/sign-in", "/sign-up", "/recover-password", "/reset-password"];
+  const noLayoutRoutes = [
+    "/sign-in",
+    "/sign-up",
+    "/recover-password",
+    "/reset-password",
+  ];
 
   /**
    * Rutas públicas accesibles sin autenticación.
@@ -49,9 +54,18 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
   };
 
   /**
-   * Determina si el encabezado debe ocultarse en la ruta actual.
+   * Determina si el layout (header/footer) debe ocultarse en la ruta actual.
    */
-  const shouldHideHeader = noHeaderRoutes.includes(location.pathname);
+  const shouldHideLayout = () => {
+    // Ocultar si coincide con alguna ruta fija
+    if (noLayoutRoutes.includes(location.pathname)) return true;
+
+    // Ocultar si es una reunión (ruta dinámica /meeting/:id)
+    const meetingPattern = /^\/meeting\/[^/]+$/;
+    if (meetingPattern.test(location.pathname)) return true;
+
+    return false;
+  };
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -60,7 +74,7 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
 
         if (!token) {
           setIsAuth(false);
-          
+
           // Si el usuario no está en una ruta pública, redirigir a "/".
           if (!isPublicRoute(location.pathname)) navigate("/");
           return;
@@ -100,8 +114,8 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
 
   return (
     <>
-      {/* Mostrar header */}
-      {!shouldHideHeader && (
+      {/* Mostrar header solo si no está oculto */}
+      {!shouldHideLayout() && (
         <>
           <div className="hidden md:block" role="banner" aria-label="Encabezado de escritorio">
             <Header auth={isAuth} setAuth={setIsAuth} />
@@ -112,12 +126,11 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
         </>
       )}
 
-        {/* Contenido de la página */}
-        {children}
+      {/* Contenido de la página */}
+      {children}
 
-
-      {/* Pie de página */}
-      <Footer aria-label="Pie de página" />
+      {/* Mostrar footer solo si no está oculto */}
+      {!shouldHideLayout() && <Footer aria-label="Pie de página" />}
     </>
   );
 };

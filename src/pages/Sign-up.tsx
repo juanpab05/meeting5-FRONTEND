@@ -12,33 +12,31 @@ export const SignUP: React.FC = () => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
+  const validatePassword = (password: string, confirmPassword: string) => {
+    if (password !== confirmPassword) return "Las contraseñas no coinciden.";
+    if (password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
+    if (!/[A-Z]/.test(password)) return "La contraseña debe contener al menos una mayúscula.";
+    if (!/[0-9]/.test(password)) return "La contraseña debe contener al menos un número.";
+    if (!/[^A-Za-z0-9]/.test(password)) return "La contraseña debe contener al menos un símbolo.";
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setErrorMessage("");
-    
     if (formulario.age <= 0 || isNaN(formulario.age)) {
       setErrorMessage("Por favor, ingresa una edad válida.");
       return;
     }
 
-
-    if (formulario.password !== formulario.confirmPassword) {
-      setErrorMessage("Las contraseñas no coinciden.");
+    const error = validatePassword(formulario.password, formulario.confirmPassword);
+    if (error) {
+      setErrorMessage(error);
       return;
     }
-
-    if (!/[A-Z]/.test(formulario.password)) {
-      setErrorMessage("La contraseña debe contener al menos una mayúscula.");
-      return;
-    }
-
-    if (formulario.password.length < 8) {
-      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
-      return;
-    }
-
-
+  
+    setErrorMessage("");
+    
     const userDataSignUP = {
       firstName: formulario.firstName,
       lastName: formulario.lastName,
@@ -58,21 +56,21 @@ export const SignUP: React.FC = () => {
         setErrorMessage("Los datos enviados no son válidos.");
       } else if (error.message.includes("Unauthorized")) {
         setErrorMessage("No tienes permiso para realizar esta acción.");
-      } 
-        else if (error.message.includes("Conflict")) {
+      }
+      else if (error.message.includes("Conflict")) {
         setErrorMessage("El correo electrónico ya está registrado.");
       }
-        else {
+      else {
         setErrorMessage("No se pudo registrar el usuario.");
       }
     }
   };
 
   return (
-      <div className="w-screen bg-meeting5 flex items-center justify-center p-6">
-        {/*Sign-up card*/}
+    <div className="w-screen bg-meeting5 flex items-center justify-center p-6">
+      {/*Sign-up card*/}
       <div className="w-full md:w-full lg:w-1/2 xl:w-1/3 flex flex-col max-w-md md:max-w-lg lg:max-w-2xl bg-white rounded-xl shadow-xl overflow-hidden">
-          {/* Card Content */}
+        {/* Card Content */}
         <div className="w-full items-center justify-center p-8 md:p-12 lg:px-16 lg:py-12">
           {/* Logo */}
           <div className="flex justify-center mb-8">
@@ -81,7 +79,7 @@ export const SignUP: React.FC = () => {
               aria-label="Ir a la página de inicio"
               className="cursor-pointer"
             >
-                <img src="logo.svg" className="w-28 rounded-xl" alt="Logo de meeting5" />
+              <img src="logo.svg" className="w-28 rounded-xl" alt="Logo de meeting5" />
             </button>
           </div>
 
@@ -195,9 +193,9 @@ export const SignUP: React.FC = () => {
               ¿Ya tienes una cuenta? Inicia sesión
             </button>
           </div>
-          </div>
         </div>
       </div>
+    </div>
   );
 };
 

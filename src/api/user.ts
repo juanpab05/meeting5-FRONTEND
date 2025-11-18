@@ -64,8 +64,7 @@ export async function fetchRegisterUser(params: UserData): Promise<any> {
  */
 export async function fetchUserProfile(): Promise<any> {
   try {
-    const token = getToken()
-    
+    const token = getToken();
     if (!token) {
       console.warn("No hay token, no se puede obtener el perfil");
       return null;
@@ -82,19 +81,20 @@ export async function fetchUserProfile(): Promise<any> {
     const data = await response.json();
 
     if (!response.ok) {
+      if (response.status === 404) {
+        // 👈 usuario no encontrado, devolver null en vez de lanzar error
+        return null;
+      }
       await handleApiError({ response, data, location: "fetchUserProfile" });
     }
 
     return data;
-    
   } catch (error) {
-    if (location) {
-      console.error("[fetchUserProfile] Unexpected error:", error);
-    }
-
+    console.error("[fetchUserProfile] Unexpected error:", error);
     throw error;
   }
 }
+
 
 /**
  * Updates the authenticated user's profile information.
@@ -108,15 +108,9 @@ export async function fetchUserProfile(): Promise<any> {
 export async function fetchUpdateUserProfile(userData: Partial<UserData>): Promise<any> {
   try {
     const token = getToken();
-    
-    if (!token) {
-      throw new Error('No hay token de autenticación disponible');
-    }
+    if (!token) throw new Error('No hay token de autenticación disponible');
 
-    const userProfile = await fetchUserProfile();
-    const userId = userProfile.data._id;
-
-    const response = await fetch(`${API}/users/${userId}`, {
+    const response = await fetch(`${API}/users/profile`, { // 👈 usa /profile
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -128,7 +122,7 @@ export async function fetchUpdateUserProfile(userData: Partial<UserData>): Promi
     const data = await response.json();
 
     if (!response.ok) {
-      await handleApiError({response, data, location: "fetchUpdateUserProfile"});
+      await handleApiError({ response, data, location: "fetchUpdateUserProfile" });
     }
 
     return data;
@@ -136,7 +130,43 @@ export async function fetchUpdateUserProfile(userData: Partial<UserData>): Promi
     if (location) {
       console.error("[fetchUpdateUserProfile] Unexpected error:", error);
     }
+    throw error;
+  }
+}
 
+/**
+ * Changes the authenticated user's password.
+ *
+ * @async
+ * @function fetchChangePassword
+ * @param {string} currentPassword - The user's current password.
+ * @param {string} newPassword - The new password to set.
+ * @returns {Promise<any>} - JSON response from the server.
+ * @throws {Error} - Throws an error if the request fails or returns a non-OK status.
+ */
+export async function fetchChangePassword(currentPassword: string, newPassword: string) {
+  try {
+    const token = getToken();
+    if (!token) throw new Error("No hay token de autenticación disponible");
+
+    const response = await fetch(`${API}/users/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al cambiar la contraseña");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("[fetchChangePassword] Unexpected error:", error);
     throw error;
   }
 }
@@ -157,11 +187,7 @@ export async function fetchDeleteUser(): Promise<any> {
       throw new Error('No hay token de autenticación disponible');
     }
 
-    // Obtener el ID del usuario
-    const userProfile = await fetchUserProfile();
-    const userId = userProfile.data._id;
-
-    const response = await fetch(`${API}/users/${userId}`, {
+    const response = await fetch(`${API}/users/account`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

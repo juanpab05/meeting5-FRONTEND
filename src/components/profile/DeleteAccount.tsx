@@ -14,29 +14,48 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { toast } from "sonner";
-import React from "react";
+import { fetchDeleteUser } from "../../api/user";
+import { useUser } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 export function DeleteAccount() {
   const [showDialog, setShowDialog] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const navigate = useNavigate();
+  const { setUser, guestUser } = useUser();
 
   const handleDelete = async () => {
     if (confirmText !== "ELIMINAR") {
       toast.error('Debes escribir "ELIMINAR" para confirmar');
       return;
     }
-
+  
     setIsDeleting(true);
-    
-    // Simulación de eliminación de cuenta
-    setTimeout(() => {
+    try {
+      const response = await fetchDeleteUser();
+  
+      if (response.success) {
+        toast.success("Cuenta eliminada exitosamente ✅");
+  
+        // 👇 limpiar todo
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setUser(guestUser);
+  
+        setShowDialog(false);
+        setConfirmText("");
+  
+        navigate("/sign-in"); // o homepage
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al eliminar la cuenta");
+    } finally {
       setIsDeleting(false);
-      toast.success("Cuenta eliminada exitosamente");
-      setShowDialog(false);
-      setConfirmText("");
-    }, 2000);
+    }
   };
+  
 
   return (
     <>
