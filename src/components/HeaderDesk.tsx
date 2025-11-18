@@ -16,7 +16,7 @@ export const Header: React.FC<PropsAuth> = ({ auth, setAuth }) => {
         flex justify-between
       "
       role="banner"
-      aria-label="Encabezado de Cinema Space"
+      aria-label="Encabezado de Meeting5"
     >
       {/* Meeting5 logo */}
       <div
