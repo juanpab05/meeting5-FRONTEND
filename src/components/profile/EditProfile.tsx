@@ -169,12 +169,15 @@ export function EditProfile() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="flex-1 bg-[#2563EB] hover:bg-[#1E40AF] text-white"
+            tabIndex={0}
+            className="flex-1 bg-[#2563EB] hover:bg-[#1E40AF] text-white 
+             focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
           >
             <Save className="w-4 h-4 mr-2" />
             {isLoading ? "Guardando..." : "Guardar Cambios"}
           </Button>
-          
+
+
           <Button
             type="button"
             variant="outline"
@@ -197,7 +200,7 @@ export function EditProfile() {
 
       <div className="mt-6 p-4 bg-[#60A5FA]/5 border border-[#60A5FA]/20 rounded-lg">
         <p className="text-sm text-[#1F2937]/70">
-          <strong>Nota:</strong> Los campos marcados con * son obligatorios. 
+          <strong>Nota:</strong> Los campos marcados con * son obligatorios.
           Asegúrate de que tu correo electrónico sea válido para recibir notificaciones importantes.
         </p>
       </div>
