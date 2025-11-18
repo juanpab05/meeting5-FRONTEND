@@ -127,7 +127,7 @@ const ResetPasswordPage: React.FC = () => {
                 required
                 disabled={isLoading}
                 aria-disabled={isLoading}
-                className="bg-white border border-gray-400 rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white border border-gray-400 rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -144,7 +144,7 @@ const ResetPasswordPage: React.FC = () => {
                 required
                 disabled={isLoading}
                 aria-disabled={isLoading}
-                className="bg-white border border-gray-400 rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white border border-gray-400 rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
