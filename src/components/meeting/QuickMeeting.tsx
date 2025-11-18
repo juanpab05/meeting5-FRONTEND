@@ -27,9 +27,9 @@ export function QuickMeeting() {
           participants: []
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         toast.success("Enlace de reunión generado exitosamente");
         // navegar directamente al meet
@@ -59,15 +59,17 @@ export function QuickMeeting() {
         </div>
         <h2 className="text-[#1F2937]">Nueva Reunión</h2>
       </div>
-      
+
       <div className="space-y-4">
         <Button
           onClick={generateMeetingLink}
-          className="w-full bg-[#2563EB] hover:bg-[#1E40AF] text-white h-12"
+          className="w-full bg-[#2563EB] hover:bg-[#1E40AF] text-white h-12
+             focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
         >
           <Video className="w-5 h-5 mr-2" />
           Crear Reunión Instantánea
         </Button>
+
 
         {generatedLink && (
           <div className="p-4 bg-[#F5F7FA] rounded-lg border border-gray-200">

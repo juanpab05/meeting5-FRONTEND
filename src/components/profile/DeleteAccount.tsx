@@ -30,22 +30,22 @@ export function DeleteAccount() {
       toast.error('Debes escribir "ELIMINAR" para confirmar');
       return;
     }
-  
+
     setIsDeleting(true);
     try {
       const response = await fetchDeleteUser();
-  
+
       if (response.success) {
         toast.success("Cuenta eliminada exitosamente ✅");
-  
+
         // 👇 limpiar todo
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setUser(guestUser);
-  
+
         setShowDialog(false);
         setConfirmText("");
-  
+
         navigate("/sign-in"); // o homepage
       }
     } catch (error) {
@@ -55,7 +55,7 @@ export function DeleteAccount() {
       setIsDeleting(false);
     }
   };
-  
+
 
   return (
     <>
@@ -87,7 +87,8 @@ export function DeleteAccount() {
           <Button
             variant="destructive"
             onClick={() => setShowDialog(true)}
-            className="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white"
+            className="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white
+             focus:outline-none focus:ring-2 focus:ring-[#EF4444] focus:ring-offset-2"
           >
             <Trash2 className="w-4 h-4 mr-2" />
             Eliminar mi Cuenta
@@ -132,7 +133,8 @@ export function DeleteAccount() {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={confirmText !== "ELIMINAR" || isDeleting}
-              className="bg-[#EF4444] hover:bg-[#DC2626] text-white"
+              className="bg-[#EF4444] hover:bg-[#DC2626] text-white
+             focus:outline-none focus:ring-2 focus:ring-[#EF4444] focus:ring-offset-2"
             >
               {isDeleting ? "Eliminando..." : "Sí, eliminar mi cuenta"}
             </AlertDialogAction>
