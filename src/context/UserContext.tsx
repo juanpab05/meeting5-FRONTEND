@@ -16,15 +16,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const guestUser = ({
   _id:"guest",
-  name: "guest",
-  surname: "",
+  firstName: "guest",
+  lastName: "",
   age: 0,
   email: "",
   password: "",
-  profilePicture: {
-    profilePictureURL: "",
-    profilePictureID: ""
-  },
   createdAt: new Date(),
   updatedAt: new Date()
   });
@@ -35,31 +31,45 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchUser = async () => {
     if (getToken() !== null) {
       try {
-        setUser(null);
         const response = await fetchUserProfile();
-        if (response) setUser({... response.data});
+        if (response) {
+          setUser({ ...response.data });
+        } else {
+          setUser(guestUser); // 👈 fallback si el perfil no existe
+        }
       } catch (error) {
         console.error("Error fetching user:", error);
         setUser(guestUser);
       } finally {
         setLoadingUser(false);
       }
-
+    } else {
+      setUser(guestUser);
+      setLoadingUser(false);
     }
   };
- 
+
+
   useEffect(() => {
     fetchUser();
   }, []);
 
   const refreshUser = async () => {
     setLoadingUser(true);
-    await fetchUser();
+    try {
+      await fetchUser();
+    } catch (error: any) {
+      if (error.message.includes("Recurso no encontrado")) {
+        setUser(guestUser); // 👈 fallback automático
+      }
+    } finally {
+      setLoadingUser(false);
+    }
   };
 
   return (
-    <UserContext.Provider 
-    value={{ user, guestUser, setUser, loadingUser, refreshUser }}
+    <UserContext.Provider
+      value={{ user, guestUser, setUser, loadingUser, refreshUser }}
     >
       {children}
     </UserContext.Provider>

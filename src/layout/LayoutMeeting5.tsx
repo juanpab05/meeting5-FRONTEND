@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Footer from "../components/Footer.tsx";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router-dom"; // 👈 usa react-router-dom
 import { getToken } from "../api/utils.ts";
 import Header from "../components/HeaderDesk.tsx";
 import { useUser } from "../context/UserContext.tsx";
@@ -18,24 +18,24 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
   const { user } = useUser();
 
   /**
-   * Rutas donde el encabezado no debe mostrarse.
+   * Rutas donde el encabezado y el footer no deben mostrarse.
    */
-  const noHeaderRoutes = ["/", "/sign-in", "/sign-up", "/recover-password", "/about-us"];
+  const noLayoutRoutes = [
+    "/sign-in",
+    "/sign-up",
+    "/recover-password",
+    "/reset-password",
+  ];
 
   /**
    * Rutas públicas accesibles sin autenticación.
    */
   const publicRoutes = [
-    "/home",
     "/reset-password",
-    "/about-us",
     "/sign-in",
     "/sign-up",
     "/",
     "/recover-password",
-    "/catalog",
-    "/view-movie",
-    "/view-movie/:id",
   ];
 
   /**
@@ -54,9 +54,18 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
   };
 
   /**
-   * Determina si el encabezado debe ocultarse en la ruta actual.
+   * Determina si el layout (header/footer) debe ocultarse en la ruta actual.
    */
-  const shouldHideHeader = noHeaderRoutes.includes(location.pathname);
+  const shouldHideLayout = () => {
+    // Ocultar si coincide con alguna ruta fija
+    if (noLayoutRoutes.includes(location.pathname)) return true;
+
+    // Ocultar si es una reunión (ruta dinámica /meeting/:id)
+    const meetingPattern = /^\/meeting\/[^/]+$/;
+    if (meetingPattern.test(location.pathname)) return true;
+
+    return false;
+  };
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -66,8 +75,8 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
         if (!token) {
           setIsAuth(false);
 
-          // Si el usuario no está en una ruta pública, redirigir a "home".
-          if (!isPublicRoute(location.pathname)) navigate("/home");
+          // Si el usuario no está en una ruta pública, redirigir a "/".
+          if (!isPublicRoute(location.pathname)) navigate("/");
           return;
         }
 
@@ -75,12 +84,12 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
         if (response) {
           setIsAuth(true);
 
-          // Si el usuario está en una ruta pública exclusiva, redirigir a "home".
-          if (publicOnlyRoutes.includes(location.pathname)) navigate("/home");
+          // Si el usuario está en una ruta pública exclusiva, redirigir a "/".
+          if (publicOnlyRoutes.includes(location.pathname)) navigate("/");
         } else {
           localStorage.removeItem("token");
           setIsAuth(false);
-          navigate("/home");
+          navigate("/");
         }
       } catch (error) {
         console.error("Error verificando token:", error);
@@ -105,39 +114,23 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
 
   return (
     <>
-      {/* Encabezado condicional */}
-      {!shouldHideHeader && (
+      {/* Mostrar header solo si no está oculto */}
+      {!shouldHideLayout() && (
         <>
-          <div className="hidden sm:block" role="banner" aria-label="Encabezado de escritorio">
+          <div className="hidden md:block" role="banner" aria-label="Encabezado de escritorio">
             <Header auth={isAuth} setAuth={setIsAuth} />
           </div>
-          <div className="block sm:hidden" role="banner" aria-label="Encabezado móvil">
+          <div className="block md:hidden" role="banner" aria-label="Encabezado móvil">
             <HeaderMobile auth={isAuth} setAuth={setIsAuth} />
           </div>
         </>
       )}
 
-      {/* Contenido principal */}
-      <main
-        className="
-        w-full max-w-screen min-h-screen
-        overflow-x-hidden flex justify-center items-center
-        bg-gradient-to-b from-gray-900 via-black to-gray-900 
-        text-white pt-16
-        "
-        role="main"
-        aria-label="Contenido principal de la página"
-      >
-        <div
-          className="
-          absolute inset-0 bg-[url('/textures/noise.svg')] opacity-10 pointer-events-none
-          "
-        />
-        {children}
-      </main>
+      {/* Contenido de la página */}
+      {children}
 
-      {/* Pie de página */}
-      <Footer auth={isAuth} aria-label="Pie de página" />
+      {/* Mostrar footer solo si no está oculto */}
+      {!shouldHideLayout() && <Footer aria-label="Pie de página" />}
     </>
   );
 };

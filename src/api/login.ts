@@ -33,7 +33,7 @@ export async function fetchLoginUser(email: string, password: string): Promise<a
       console.log("[fetchLoginUser] User logged in successfully:", data);
     }
 
-    return data;
+    return data.data;
   } catch (error) {
     if (location) {
       console.error("[fetchLoginUser] Unexpected error:", error);

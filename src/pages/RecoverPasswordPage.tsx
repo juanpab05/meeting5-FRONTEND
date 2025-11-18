@@ -1,138 +1,117 @@
 import { useState } from "react";
-import { CinemaLogo } from "../components/CinemaLogo";
-import { useNavigate } from "react-router";
+import { Mail, Send } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { toast } from "sonner";
+import React from "react";
+
+// 👇 Importamos la función desde reset-password.ts
 import { fetchRecoverPassword } from "../api/reset-password";
 
-export const RecoverPassword: React.FC = () => {
-  const [formulario, setFormulario] = useState({email: ""})
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
+export function RecoverPassword() {
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formulario.email)) {
-      setErrorMessage("Ingresa un correo electrónico válido.");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.includes("@")) {
+      toast.error("Ingresa un correo electrónico válido");
       return;
     }
 
-    try {
-      setLoading(true);
-      const response = await fetchRecoverPassword(formulario.email);
+    setIsLoading(true);
 
-      if (response.ok) {
-        setSuccessMessage(`Se enviaron instrucciones a ${formulario.email}.`);
-        setFormulario({ email: "" });
+    try {
+      // 👇 Usamos la función centralizada
+      const data = await fetchRecoverPassword(email);
+
+      if (data.success) {
+        setEmailSent(true);
+        toast.success(data.message);
       } else {
-        const data = await response.json();
-        setErrorMessage(data.message || "No se pudo enviar el correo. Intenta más tarde.");
+        toast.error(data.message || "No se pudo enviar el correo de recuperación");
       }
     } catch (error: any) {
-      setErrorMessage("Ocurrió un error en el servidor. Inténtalo más tarde.");
-      console.error("RecoverPassword error:", error);
+      console.error(error);
+      toast.error(error.message || "Error al enviar el correo de recuperación");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormulario({...formulario, [e.target.name]: e.target.value, });
-  };
-
-  const handleBackToLogin = () => {
-    navigate("/sign-in");
-  };
-
-  const handleGoHome = () => {
-    navigate("/home");
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl shadow-2xl overflow-hidden">
-        <div className="p-8">
-          {/* Logo */}
-          <div className="flex justify-center mb-8">
-            <button
-              onClick={handleGoHome}
-              className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
-              aria-label="Ir a la página de inicio"
-            >
-              <CinemaLogo size="w-32 h-32"/>
-            </button>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200 w-full max-w-[630px]">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-lg bg-[#60A5FA]/10 flex items-center justify-center">
+            <Mail className="w-5 h-5 text-[#60A5FA]" />
           </div>
-
-          {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-white text-3xl font-bold mb-3" id="recover-password-title">Recuperar contraseña</h1>
-            <p className="text-gray-400 text-base" id="recover-password-desc">
-              Ingresa tu correo para recibir las instrucciones de recuperación
+          <div>
+            <h2 className="text-[#1F2937] text-lg font-semibold">Recuperar contraseña</h2>
+            <p className="text-sm text-[#1F2937]/60">
+              Recibe un enlace para restablecer tu contraseña
             </p>
           </div>
+        </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6" aria-labelledby="recover-password-title">
-            <div>
-              <label htmlFor="email" className="sr-only">Correo electrónico</label>
-              <input
+        {!emailSent ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="recovery-email">Correo electrónico</Label>
+              <Input
+                id="recovery-email"
                 type="email"
-                name="email"
-                id="email"
-                placeholder="Correo electrónico"
-                value={formulario.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@correo.com"
                 required
-                disabled={loading}
-                className="bg-white rounded-xl h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-disabled={loading}
               />
+              <p className="text-xs text-[#1F2937]/60">
+                Te enviaremos un enlace para restablecer tu contraseña
+              </p>
             </div>
 
-            {/* Error message */}
-            {errorMessage && (
-              <div role="alert" className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                <p className="text-red-400 text-sm text-center">{errorMessage}</p>
-              </div>
-            )}
-
-            {/* Success message */}
-            {successMessage && (
-              <div role="status" className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                <p className="text-green-400 text-sm text-center">{successMessage}</p>
-              </div>
-            )}
-
-            {/* Submit button */}
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              aria-disabled={loading}
+              disabled={isLoading}
+              className="w-full bg-[#1D4ED8] hover:bg-[#1943B8] text-white"
             >
-              {loading ? "Enviando..." : "Enviar instrucciones"}
-            </button>
+              <Send className="w-4 h-4 mr-2" />
+              {isLoading ? "Enviando..." : "Enviar enlace de recuperación"}
+            </Button>
           </form>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 rounded-lg p-4">
+              <div className="flex gap-3">
+                <Mail className="w-5 h-5 text-[#22C55E] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-[#1F2937] mb-1 font-medium">
+                    Correo enviado exitosamente
+                  </p>
+                  <p className="text-sm text-[#1F2937]/70">
+                    Hemos enviado un enlace de recuperación a <strong>{email}</strong>. Revisa tu bandeja de entrada y carpeta de spam.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          {/* Back to login link */}
-          <div className="flex justify-center mt-8">
-            <button 
-              onClick={handleBackToLogin}
-              disabled={loading}
-              className="text-blue-400 hover:text-blue-500 font-medium transition-colors disabled:opacity-50"
-              aria-disabled={loading}
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEmailSent(false);
+                setEmail("");
+              }}
+              className="w-full"
             >
-              Volver al inicio de sesión
-            </button>
+              Enviar a otro correo
+            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default RecoverPassword;
+}
