@@ -48,11 +48,11 @@ export const LoginPage = () => {
   }
 
   const handleFacebookLogin = () => {
-    // Implement Facebook login logic here
+    // Implement Facebook login logic here - aqui que iria teniendo en cuenta que usamos typescript
   }
 
   const handleGoogleLogin = () => {
-    // Implement Google login logic here
+    // Implement Google login logic here - aqui que iria teniendo en cuenta que usamos typescript
   }
 
   const handleForgotPassword = () => {
