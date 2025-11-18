@@ -64,7 +64,7 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="w-screen bg-meeting5 flex items-center justify-center p-6">
+    <div className="w-full h-screen bg-meeting5 flex items-center justify-center p-6">
       {/* Login card */}
       <div className="w-full md:w-full lg:w-1/2 xl:w-1/3 flex flex-col max-w-md md:max-w-lg lg:max-w-2xl bg-white rounded-xl shadow-xl overflow-hidden">
         {/* Card Content */}

@@ -77,7 +77,7 @@ export function RecoverPassword() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#60A5FA] hover:bg-[#3B82F6] text-white"
+              className="w-full bg-[#1D4ED8] hover:bg-[#1943B8] text-white"
             >
               <Send className="w-4 h-4 mr-2" />
               {isLoading ? "Enviando..." : "Enviar enlace de recuperación"}

@@ -81,7 +81,7 @@ const ResetPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-meeting5 flex items-center justify-center p-4">
+    <div className="h-screen bg-meeting5 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden">
         <div className="p-8">
           <div className="flex justify-center mb-8">
