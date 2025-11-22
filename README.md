@@ -19,10 +19,10 @@ Su nombre "meeting5" viene de la palabra meetings, que significa reuniones, pero
    - `/profile`: Visualización de los datos del usuario, los cuales tambien pueden ser editados, e incluso eliminar el perfil.
   
 5. **Videollamadas**
-  - `/create-meet`: Página principal de las videollamadas, la cual solo es accesible luego de iniciar sesión. En esta el usuario puede crear su propia videollamada o unirse a una.
-  - `/meeting:id`: Página de las reuniones, donde id es una combinacion alfanumerica única que se crea automaticamente cuando el usuario crea una nueva reunión.
+   - `/create-meet`: Página principal de las videollamadas, la cual solo es accesible luego de iniciar sesión. En esta el usuario puede crear su propia videollamada o unirse a una.
+   - `/meeting:id`: Página de las reuniones, donde id es una combinacion alfanumerica única que se crea automaticamente cuando el usuario crea una nueva reunión.
 
-6. **Información general**
+7. **Información general**
    - `/#about-us`: Sección donde se describe el proyecto y su propósito.
   
 ## Dependencias principales usadas
