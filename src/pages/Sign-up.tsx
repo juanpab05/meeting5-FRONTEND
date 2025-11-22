@@ -4,6 +4,7 @@ import { fetchRegisterUser } from "../api/user";
 
 export const SignUP: React.FC = () => {
   const [formulario, setFormulario] = useState({ firstName: "", lastName: "", age: 0, email: "", password: "", confirmPassword: "" });
+  const [age, setAge] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ export const SignUP: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    formulario.age = Number(age);
 
     if (formulario.age <= 0 || isNaN(formulario.age)) {
       setErrorMessage("Por favor, ingresa una edad válida.");
@@ -57,7 +60,7 @@ export const SignUP: React.FC = () => {
       } else if (error.message.includes("Unauthorized")) {
         setErrorMessage("No tienes permiso para realizar esta acción.");
       }
-      else if (error.message.includes("Conflict")) {
+      else if (error.message.includes("Email is already registered")) {
         setErrorMessage("El correo electrónico ya está registrado.");
       }
       else {
@@ -67,7 +70,7 @@ export const SignUP: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-screen bg-meeting5 flex items-center justify-center p-6">
+    <div className="w-full min-h-screen bg-meeting5 flex items-center justify-center p-6">
       {/*Sign-up card*/}
       <div className="w-full md:w-full lg:w-1/2 xl:w-1/3 flex flex-col max-w-md md:max-w-lg lg:max-w-2xl bg-white rounded-xl shadow-xl overflow-hidden">
         {/* Card Content */}
@@ -124,11 +127,11 @@ export const SignUP: React.FC = () => {
                   type="text"
                   id="age"
                   name="age"
-                  value={formulario.age}
+                  value={age}
                   placeholder="Edad"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  onChange={handleChange}
+                  onChange={(e) => setAge(e.target.value)}
                 />
                 <label htmlFor="email" className="sr-only">Correo electrónico</label>
                 <input

@@ -66,10 +66,10 @@ export async function handleApiError({ response, data, location }: HandleApiErro
   // Messages
   switch (response.status) {
     case 400:
-      errorMessage = "Solicitud inválida. Verifica los datos enviados.";
+      errorMessage = data.message || "La solicitud es inválida.";
       break;
     case 401:
-      errorMessage = "Usuario no autenticado. Por favor inicia sesión.";
+      errorMessage = "Correo o contraseña incorrectos.";
       break;
     case 403:
       errorMessage = "No tienes permisos para realizar esta acción.";

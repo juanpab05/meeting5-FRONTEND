@@ -29,9 +29,9 @@ export async function fetchLoginUser(email: string, password: string): Promise<a
       await handleApiError({response, location: "fetchLoginUser"});
     }
 
-    if (location) {
-      console.log("[fetchLoginUser] User logged in successfully:", data);
-    }
+    //if (location) {
+      //console.log("[fetchLoginUser] User logged in successfully:", data);
+    //}
 
     return data.data;
   } catch (error) {
