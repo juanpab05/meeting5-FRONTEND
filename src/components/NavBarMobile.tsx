@@ -4,6 +4,13 @@ import { getToken } from "../api/utils";
 import { ListIcon } from "lucide-react";
 import { useUser } from "../context/UserContext";
 
+/**
+ * Mobile navigation panel (slide-out) used on small screens.
+ *
+ * Props:
+ * - `isAuth` (optional): whether the user is authenticated; controls which
+ *    navigation items (login/burger-menu vs create-meet/burger-menu) are shown.
+ */
 export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
   const fila =
     "border-b border-white/20 flex w-full justify-center items-center py-6";
@@ -17,14 +24,14 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
 
   const { setUser, guestUser } = useUser();
 
+  /**
+   * Clears authentication artifacts and resets context to guest user.
+   */
   const handleLogout = () => {
-    // Remove auth data and reset user in context
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(guestUser);
     setIsOpen(false);
-    // Optionally navigate to home or login
-    // window.location.href = "/";
   };
 
   useEffect(() => {

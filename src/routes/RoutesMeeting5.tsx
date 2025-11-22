@@ -9,6 +9,13 @@ import LayoutMeeting5 from "../layout/LayoutMeeting5";
 import CreateMeetingPage from "../pages/CreateMeetPage";
 import { VideoCallPage } from "../pages/VideoCallPage";
 
+/**
+ * Router component for the Meeting5 application.
+ *
+ * Defines all the app routes and wraps them in the main layout.
+ * @returns {JSX.Element}
+ */
+
 const RoutesMeeting5 = () => {
   return (
     <LayoutMeeting5>

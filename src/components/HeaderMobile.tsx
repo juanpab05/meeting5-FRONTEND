@@ -3,6 +3,12 @@ import Login from "./HeaderButtons";
 import { PropsAuth } from "../schemas/auth";
 import React from "react";
 
+/**
+ * Mobile header component.
+ *
+ * Compact header used on small screens that shows a logo, quick auth
+ * buttons and the mobile navigation toggle.
+ */
 export const HeaderMobile: React.FC<PropsAuth> = ({ auth, setAuth }) => {
   return (
     <header
