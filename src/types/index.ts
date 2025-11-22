@@ -10,9 +10,8 @@ export interface Participant {
 
 export interface ChatMessage {
   id: string;
-  participantId: string;
-  participantName: string;
   message: string;
+  sender: string;
   timestamp: Date;
 }
 

@@ -35,7 +35,7 @@ const LayoutMeeting5: React.FC<LayoutMeeting5Props> = ({ children }) => {
     "/sign-in",
     "/sign-up",
     "/",
-    "/recover-password",
+    "/recover-password"
   ];
 
   /**

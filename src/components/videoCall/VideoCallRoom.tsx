@@ -72,17 +72,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     setShowParticipants(!showParticipants);
   };
 
-  // ✉️ Send chat message
-  const sendMessage = (message: string) => {
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      participantId: "local",
-      participantName: "Tú",
-      message,
-      timestamp: new Date(),
-    };
-    setChatMessages((prev) => [...prev, newMessage]);
-  };
 
   // 🚪 Leave call
   // Si no pasas onLeave desde las rutas, aquí puedes definir el comportamiento por defecto
@@ -125,7 +114,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         {showChat && (
           <ChatPanel
             messages={chatMessages}
-            onSendMessage={sendMessage}
             onClose={toggleChat}
           />
         )}
