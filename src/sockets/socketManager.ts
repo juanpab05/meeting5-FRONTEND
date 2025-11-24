@@ -21,7 +21,19 @@ const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:3001";
 export const socket: Socket = io(SOCKET_URL, {
   transports: ["websocket"],
   autoConnect: false,
+  auth: {
+    token: localStorage.getItem("token") || undefined,
+  },
 });
+
+export const connectRoomSocket = (meetingId: string) => {
+  if (!socket.connected) {
+    socket.connect();
+  }
+  if(meetingId){
+    socket.emit("join-room", { meetingId, token: localStorage.getItem("token") });
+  }
+};
 
 /**
  * Connect the shared socket and, optionally, notify the server of the user id.
@@ -29,14 +41,14 @@ export const socket: Socket = io(SOCKET_URL, {
  * @param {string} [userId] - Optional user id to emit with the "newUser" event
  *                            after the socket connects.
  */
-export const connectSocket = (userId?: string) => {
+export const connectSocket = (userId?: string, meetingId?: string, userName?: string) => {
   if (!socket.connected) {
     socket.connect();
   }
 
-  if (userId) {
+  if (userId && meetingId && userName) {
     // Inform server which user connected (server may use this for presence)
-    socket.emit("newUser", userId);
+    socket.emit("newUser", { userId, meetingId, userName });
   }
 };
 

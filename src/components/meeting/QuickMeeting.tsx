@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 export function QuickMeeting() {
   const [copied, setCopied] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
+  const [description, setDescription] = useState("");
+  const [participants, setParticipants] = useState("");
   const navigate = useNavigate();
 
   const generateMeetingLink = async () => {
@@ -23,8 +25,9 @@ export function QuickMeeting() {
         },
         body: JSON.stringify({
           title: "AUTO_GENERATE",
+          description: description,
           scheduledAt: now,
-          participants: []
+          participants: participants.split(",").map(email => email.trim()).filter(email => email)
         }),
       });
 
@@ -53,7 +56,7 @@ export function QuickMeeting() {
 
   return (
     <Card className="p-6 bg-white border border-gray-200 shadow-sm">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-2">
         <div className="p-2 bg-[#60A5FA]/10 rounded-lg">
           <Video className="w-5 h-5 text-[#2563EB]" />
         </div>
@@ -61,6 +64,20 @@ export function QuickMeeting() {
       </div>
 
       <div className="space-y-4">
+        <Input
+            id="description-id"
+            type="text"
+            placeholder="Escribe una descripción para la reunión (opcional)"
+            onChange={(e) => setDescription(e.target.value)}
+            className="bg-white border-gray-300 text-[#1F2937] py-12"
+          />
+        <Input
+            id="participants-id"
+            type="text"
+            placeholder="Escribe los emails de los participantes (opcional)"
+            onChange={(e) => setParticipants(e.target.value)}
+            className="bg-white border-gray-300 text-[#1F2937]"
+          />
         <Button
           onClick={generateMeetingLink}
           className="w-full bg-[#2563EB] hover:bg-[#1E40AF] text-white h-12

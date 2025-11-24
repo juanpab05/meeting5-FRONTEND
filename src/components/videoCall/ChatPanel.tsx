@@ -24,6 +24,7 @@ export function ChatPanel({
   }
   console.log("User data in ChatPanel:", userData);
 
+  /*
   useEffect(() => {
     connectSocket(userData);
 
@@ -35,7 +36,7 @@ export function ChatPanel({
       disconnectSocket();
       socket.off("chatMessage");
     };
-  }, [userData]);
+  }, [userData]);*/
 
   const handleSend = () => {
     if (!input.trim()) return;
