@@ -1,11 +1,22 @@
 import type React from "react"
-import { useState } from "react"
-import { Eye, EyeOff } from "lucide-react"
-import { useNavigate } from "react-router"
-import { useUser } from "../context/UserContext"
-import { fetchLoginUser } from "../api/login"
 
-export const LoginPage = () => {
+import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import { fetchLoginUser } from "../api/login";
+import { useEffect, useState } from "react";
+import useAuthStore from "../stores/useAuthStore";
+
+//const { setUser } = useAuthStore();
+
+const LoginPage: React.FC = () => { 
+
+  const navigate = useNavigate();
+  const { loginWithGoogle, loginWithFacebook, loginWithEmail, initAuthObserver } = useAuthStore();
+
+
+
+
   const [formulario, setFormulario] = useState({
     email: "",
     password: "",
@@ -14,8 +25,6 @@ export const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const {refreshUser} = useUser();
-
-  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value })
@@ -46,23 +55,41 @@ export const LoginPage = () => {
       setIsLoading(false)
     }
   }
+  const handleFacebookLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
 
-  const handleFacebookLogin = () => {
-    // Implement Facebook login logic here - aqui que iria teniendo en cuenta que usamos typescript
-  }
+    try {
+      await loginWithFacebook();
+      navigate("/UserProfilePage");
+    } catch (error: any) {
+      console.error("Facebook login error:", error);
+      setErrorMessage("Ocurrió un problema con Facebook. Intenta nuevamente.");
+    }
+  };
+  const handleGoogleLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
 
-  const handleGoogleLogin = () => {
-    // Implement Google login logic here - aqui que iria teniendo en cuenta que usamos typescript
-  }
+    try {
+      await loginWithGoogle();
+      navigate("/UserProfilePage");
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      setErrorMessage("Ocurrió un problema con Google. Intenta nuevamente.");
+    }
+  };
+ 
+  useEffect(() => {
+    const unsub = initAuthObserver(); 
+    return () => unsub();
+  }, [initAuthObserver]); 
 
   const handleForgotPassword = () => {
-    navigate("/recover-password")
+    navigate("/RecoverPasswordPage")
   }
 
   const handleSignUp = () => {
     navigate("/sign-up")
   }
-
   return (
     <div className="w-full h-screen bg-meeting5 flex items-center justify-center p-6">
       {/* Login card */}
@@ -157,18 +184,18 @@ export const LoginPage = () => {
           <div className="mt-4 flex flex-col gap-6">
             {/* Facebook login button */}
               <button
-                type="submit"
+                type="button"
                 onClick={handleFacebookLogin}
                 disabled={isLoading}
-                className="w-full bg-[#E6E6E6] hover:bg-[#CCCCCC] text-xl text-[#1D4ED8] font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full bg-[#E6E6E6] hover:bg-[#CCCCCC] text-xl text-[#32A753] font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <img src="facebook-logo.png" alt="Logo de Facebook" className="inline-block w-6 h-6 mr-2 align-middle" />
                 Ingresar
-              </button>
+            </button> 
 
             {/* Google login button */}
               <button
-                type="submit"
+                type="button"
                 onClick={handleGoogleLogin}
                 disabled={isLoading}
                 className="w-full bg-[#E6E6E6] hover:bg-[#CCCCCC] text-xl text-[#32A753] font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
