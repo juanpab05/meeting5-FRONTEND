@@ -10,6 +10,7 @@ import { socket, connectRoomSocket, getRoomCount} from "../../sockets/socketMana
 import { useEffect } from "react";
 
 import type { Participant, ChatMessage, roomCount, VideoCallRoomProps } from "../../types";
+import { toast } from "sonner";
 
 export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const { id } = useParams(); // meetingId desde la URL
@@ -22,14 +23,23 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       connectRoomSocket(id);
     }
     socket.on("room-count", (roomCount: roomCount) => {
-        console.log(`Current participants in room ${id}: ${roomCount.userIds}`);
+        //console.log(`Current participants in room ${id}: ${roomCount.userIds}`);
         setNumParticipants(roomCount.uniqueUserCount + 1); // +1 to account for local user
       });
     socket.on("new-message", (msg: ChatMessage) => {
         setChatMessages(prev => [...prev, msg]);
-        console.log('new-message listeners count', socket.listeners('new-message')?.length);
+        //console.log('new-message listeners count', socket.listeners('new-message')?.length);
+      });
+    socket.on("error", (errorMessage: { message: string }) => {
+        console.error("Socket error:", errorMessage);
+        if (errorMessage.message === "Access denied to this meeting") {
+          toast.error("Acceso denegado a esta reunión");
+          handleLeave();
+        }
       });
     return () => {
+      socket.off('error');
+      socket.off('room-count');
       socket.off('new-message');
     };
   }, [socket]);
@@ -102,7 +112,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       onLeave();
     } else {
       socket.emit("leave-room")
-      navigate("/"); // 👈 redirige al home al salir
+      navigate("/create-meet"); // 👈 redirige al home al salir
     }
   };
 
