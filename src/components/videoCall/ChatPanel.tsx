@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { X, Send } from "lucide-react";
-import { socket , connectSocket, disconnectSocket } from '../../sockets/socketManager';
+import { socket } from '../../sockets/socketManager';
 
 
 interface ChatPanelProps {

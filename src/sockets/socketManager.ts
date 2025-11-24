@@ -35,28 +35,3 @@ export const connectRoomSocket = (meetingId: string) => {
   }
 };
 
-/**
- * Connect the shared socket and, optionally, notify the server of the user id.
- *
- * @param {string} [userId] - Optional user id to emit with the "newUser" event
- *                            after the socket connects.
- */
-export const connectSocket = (userId?: string, meetingId?: string, userName?: string) => {
-  if (!socket.connected) {
-    socket.connect();
-  }
-
-  if (userId && meetingId && userName) {
-    // Inform server which user connected (server may use this for presence)
-    socket.emit("newUser", { userId, meetingId, userName });
-  }
-};
-
-/**
- * Disconnect the shared socket if currently connected.
- */
-export const disconnectSocket = () => {
-  if (socket.connected) {
-    socket.disconnect();
-  }
-};

@@ -6,7 +6,7 @@ import { ChatPanel } from "./ChatPanel";
 import { ParticipantsList } from "./ParticipantsList";
 import { useUser } from "../../context/UserContext"; 
 import { useNavigate } from "react-router-dom";
-import { socket, connectRoomSocket, disconnectSocket} from "../../sockets/socketManager";
+import { socket, connectRoomSocket} from "../../sockets/socketManager";
 import { useEffect } from "react";
 
 import type { Participant, ChatMessage, VideoCallRoomProps } from "../../types";
