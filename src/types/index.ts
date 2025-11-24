@@ -42,6 +42,14 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
+export interface roomCount {
+  meetingId: string;
+  socketsCount: number; 
+  uniqueUserCount: number;
+  socketIds: string[];
+  userIds: string[];
+}
+
 /**
  * Props passed to a create-meeting UI component.
  *

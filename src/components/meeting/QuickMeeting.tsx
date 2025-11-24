@@ -12,9 +12,20 @@ export function QuickMeeting() {
   const [generatedLink, setGeneratedLink] = useState("");
   const [description, setDescription] = useState("");
   const [participants, setParticipants] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const navigate = useNavigate();
 
   const generateMeetingLink = async () => {
+    console.log("participants: ", participants);
+    // Determine public/private based on participants input.
+    // Don't rely on `setIsPublic` updating synchronously; compute a local value
+    // and use it in the request body. Also keep state in sync for UI.
+    const participantsTrimmed = participants.trim();
+    const participantsArray = participantsTrimmed
+      ? participantsTrimmed.split(",").map((email) => email.trim()).filter((email) => email)
+      : [];
+    const computedIsPublic = participantsArray.length === 0 ? true : isPublic;
+    setIsPublic(computedIsPublic);
     try {
       const now = new Date().toISOString();
       const response = await fetch(`${import.meta.env.VITE_API_URL}/meetings`, {
@@ -27,7 +38,8 @@ export function QuickMeeting() {
           title: "AUTO_GENERATE",
           description: description,
           scheduledAt: now,
-          participants: participants.split(",").map(email => email.trim()).filter(email => email)
+          participants: participantsArray,
+          isPublic: computedIsPublic,
         }),
       });
 

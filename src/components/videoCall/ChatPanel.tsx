@@ -17,12 +17,20 @@ export function ChatPanel({
   messages,
   onClose,
 }: ChatPanelProps) {
+  const [userName, setUserName] = useState("");
   const [input, setInput] = useState("");
 
   const userData = localStorage.getItem("user");
   if (!userData){
     throw new Error("User data not found in localStorage");
   }
+
+  const parsedData = JSON.parse(userData);
+
+  useEffect(() => {
+    setUserName(`${parsedData.firstName} ${parsedData.lastName}`);
+  }, [parsedData]);
+
   //console.log("User data in ChatPanel:", userData);
 
   const handleSend = () => {
@@ -31,7 +39,7 @@ export function ChatPanel({
       id: "",
       meetingId: "",
       userId: "",
-      userName: "",
+      userName: userName,
       content: input,
       timestamp: new Date(),
     }

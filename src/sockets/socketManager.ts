@@ -35,3 +35,9 @@ export const connectRoomSocket = (meetingId: string) => {
   }
 };
 
+export const getRoomCount = (meetingId: string) => {
+  if(meetingId){
+    socket.emit("get-room-count", { meetingId });
+  }
+};
+

@@ -6,19 +6,25 @@ import { ChatPanel } from "./ChatPanel";
 import { ParticipantsList } from "./ParticipantsList";
 import { useUser } from "../../context/UserContext"; 
 import { useNavigate } from "react-router-dom";
-import { socket, connectRoomSocket} from "../../sockets/socketManager";
+import { socket, connectRoomSocket, getRoomCount} from "../../sockets/socketManager";
 import { useEffect } from "react";
 
-import type { Participant, ChatMessage, VideoCallRoomProps } from "../../types";
+import type { Participant, ChatMessage, roomCount, VideoCallRoomProps } from "../../types";
 
 export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const { id } = useParams(); // meetingId desde la URL
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [numParticipants, setNumParticipants] = useState(1);
 
   useEffect(() => {
     if (id) {
+      getRoomCount(id);
       connectRoomSocket(id);
     }
+    socket.on("room-count", (roomCount: roomCount) => {
+        console.log(`Current participants in room ${id}: ${roomCount.userIds}`);
+        setNumParticipants(roomCount.uniqueUserCount + 1); // +1 to account for local user
+      });
     socket.on("new-message", (msg: ChatMessage) => {
         setChatMessages(prev => [...prev, msg]);
         console.log('new-message listeners count', socket.listeners('new-message')?.length);
@@ -107,8 +113,8 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         <div>
           <h1 className="text-white">Sala de Reunión</h1>
           <p className="text-sm text-gray-400">
-            ID: {id} • {participants.length}{" "}
-            {participants.length === 1 ? "participante" : "participantes"}
+            ID: {id} • {numParticipants}{" "}
+            {numParticipants === 1 ? "participante" : "participantes"}
           </p>
         </div>
         <div className="flex items-center gap-2">
