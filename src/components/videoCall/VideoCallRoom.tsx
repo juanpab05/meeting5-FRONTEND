@@ -6,19 +6,28 @@ import { ChatPanel } from "./ChatPanel";
 import { ParticipantsList } from "./ParticipantsList";
 import { useUser } from "../../context/UserContext"; 
 import { useNavigate } from "react-router-dom";
-import { socket, connectRoomSocket } from "../../sockets/socketManager";
+import { socket, connectRoomSocket, disconnectSocket} from "../../sockets/socketManager";
 import { useEffect } from "react";
 
 import type { Participant, ChatMessage, VideoCallRoomProps } from "../../types";
 
 export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const { id } = useParams(); // meetingId desde la URL
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
     if (id) {
       connectRoomSocket(id);
     }
-  }, [id]);
+    socket.on("new-message", (msg: ChatMessage) => {
+        setChatMessages(prev => [...prev, msg]);
+        console.log('new-message listeners count', socket.listeners('new-message')?.length);
+      });
+    return () => {
+      socket.off('new-message');
+    };
+  }, [socket]);
+
 
   const navigate = useNavigate();
 
@@ -39,7 +48,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
   // 🔊 Toggle audio

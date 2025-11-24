@@ -26,10 +26,19 @@ export interface Participant {
  * @property {string} sender - Identifier (id or name) of the sender.
  * @property {Date} timestamp - When the message was created.
  */
-export interface ChatMessage {
+/*export interface ChatMessage {
   id: string;
   message: string;
   sender: string;
+  timestamp: Date;
+}*/
+
+export interface ChatMessage {
+  id: string;
+  meetingId: string;
+  userId: string;
+  userName: string;
+  content: string;
   timestamp: Date;
 }
 

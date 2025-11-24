@@ -14,42 +14,28 @@ interface ChatPanelProps {
 }
 
 export function ChatPanel({
+  messages,
   onClose,
 }: ChatPanelProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+
   const userData = localStorage.getItem("user");
   if (!userData){
     throw new Error("User data not found in localStorage");
   }
-  console.log("User data in ChatPanel:", userData);
-
-  /*
-  useEffect(() => {
-    connectSocket(userData);
-
-    socket.on("chatMessage", (msg: ChatMessage) => {
-      setMessages(prev => [...prev, msg]);
-    });
-
-    return () => {
-      disconnectSocket();
-      socket.off("chatMessage");
-    };
-  }, [userData]);*/
+  //console.log("User data in ChatPanel:", userData);
 
   const handleSend = () => {
     if (!input.trim()) return;
-
     const newMsg: ChatMessage = {
-      id: crypto.randomUUID(),
-      message: input,
-      sender: JSON.parse(userData).firstName,
-      timestamp: new Date()
-    };
-
-    socket.emit("chatMessage", newMsg);
-    setMessages(prev => [...prev, newMsg]);
+      id: "",
+      meetingId: "",
+      userId: "",
+      userName: "",
+      content: input,
+      timestamp: new Date(),
+    }
+    socket.emit("send-message", newMsg);
     setInput("");
   };
 
@@ -95,14 +81,14 @@ export function ChatPanel({
               <div key={message.id} className="space-y-1">
                 <div className="flex items-baseline gap-2">
                   <span className="text-sm text-white">
-                    {message.sender}
+                    {message.userName}
                   </span>
                   <span className="text-xs text-gray-500">
                     {formatTime(new Date(message.timestamp))}
                   </span>
                 </div>
                 <div className="bg-gray-700 rounded-lg p-3">
-                  <p className="text-sm text-gray-200">{message.message}</p>
+                  <p className="text-sm text-gray-200">{message.content}</p>
                 </div>
               </div>
             ))}
