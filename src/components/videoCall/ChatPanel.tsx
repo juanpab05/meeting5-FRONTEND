@@ -1,28 +1,50 @@
 import { useState } from "react";
-import type { ChatMessage } from "../../types"
+import React, { useEffect } from 'react';
+import type { ChatMessage } from "../../types";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { X, Send } from "lucide-react";
+import { socket } from '../../sockets/socketManager';
+
 
 interface ChatPanelProps {
   messages: ChatMessage[];
-  onSendMessage: (message: string) => void;
   onClose: () => void;
 }
 
 export function ChatPanel({
   messages,
-  onSendMessage,
   onClose,
 }: ChatPanelProps) {
-  const [newMessage, setNewMessage] = useState("");
+  const [userName, setUserName] = useState("");
+  const [input, setInput] = useState("");
+
+  const userData = localStorage.getItem("user");
+  if (!userData){
+    throw new Error("User data not found in localStorage");
+  }
+
+  const parsedData = JSON.parse(userData);
+
+  useEffect(() => {
+    setUserName(`${parsedData.firstName} ${parsedData.lastName}`);
+  }, [parsedData]);
+
+  //console.log("User data in ChatPanel:", userData);
 
   const handleSend = () => {
-    if (newMessage.trim()) {
-      onSendMessage(newMessage);
-      setNewMessage("");
+    if (!input.trim()) return;
+    const newMsg: ChatMessage = {
+      id: "",
+      meetingId: "",
+      userId: "",
+      userName: userName,
+      content: input,
+      timestamp: new Date(),
     }
+    socket.emit("send-message", newMsg);
+    setInput("");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -67,14 +89,14 @@ export function ChatPanel({
               <div key={message.id} className="space-y-1">
                 <div className="flex items-baseline gap-2">
                   <span className="text-sm text-white">
-                    {message.participantName}
+                    {message.userName}
                   </span>
                   <span className="text-xs text-gray-500">
-                    {formatTime(message.timestamp)}
+                    {formatTime(new Date(message.timestamp))}
                   </span>
                 </div>
                 <div className="bg-gray-700 rounded-lg p-3">
-                  <p className="text-sm text-gray-200">{message.message}</p>
+                  <p className="text-sm text-gray-200">{message.content}</p>
                 </div>
               </div>
             ))}
@@ -87,15 +109,15 @@ export function ChatPanel({
         <div className="flex gap-2">
           <Input
             placeholder="Escribe un mensaje..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             className="bg-gray-700 border-gray-600 text-black placeholder:text-gray-400"
           />
           <Button
             onClick={handleSend}
             size="icon"
-            disabled={!newMessage.trim()}
+            disabled={!input.trim()}
             className="bg-blue-600 hover:bg-blue-700 text-white w-9 h-9 flex items-center justify-center"
           >
             <Send className="w-4 h-4" />

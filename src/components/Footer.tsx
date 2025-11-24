@@ -2,9 +2,12 @@
 import { Link } from "react-router";
 
 /**
+ * Footer component for the application.
  *
- * @component
- * @returns {JSX.Element} Footer 
+ * Provides quick links (site map) and accessibility attributes. This
+ * component is present on most pages and uses semantic `footer` markup.
+ *
+ * @returns {JSX.Element}
  */
 export const Footer = () => {
   const hover = "hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200";

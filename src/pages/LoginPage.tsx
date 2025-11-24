@@ -5,6 +5,13 @@ import { useNavigate } from "react-router"
 import { useUser } from "../context/UserContext"
 import { fetchLoginUser } from "../api/login"
 
+/**
+ * Login page component.
+ *
+ * Handles email/password authentication. On successful login it stores the
+ * token and user in localStorage and refreshes the user context, then
+ * navigates the user to the meeting creation page.
+ */
 export const LoginPage = () => {
   const [formulario, setFormulario] = useState({
     email: "",
@@ -20,6 +27,11 @@ export const LoginPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value })
   }
+
+  /**
+   * Update local `formulario` state when inputs change.
+   * @param e - Input change event
+   */
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -47,6 +59,12 @@ export const LoginPage = () => {
     }
   }
 
+  /**
+   * Handle the login form submission.
+   * - Calls `fetchLoginUser` and persists token/user on success.
+   * - Updates error state on failure and toggles loading flag.
+   */
+
   const handleFacebookLogin = () => {
     // Implement Facebook login logic here - aqui que iria teniendo en cuenta que usamos typescript
   }
@@ -54,6 +72,16 @@ export const LoginPage = () => {
   const handleGoogleLogin = () => {
     // Implement Google login logic here - aqui que iria teniendo en cuenta que usamos typescript
   }
+
+  /**
+   * Placeholder: handle third-party login (Facebook).
+   * Implement OAuth popup/redirect flow as required by the provider.
+   */
+
+  /**
+   * Placeholder: handle third-party login (Google).
+   * Implement OAuth popup/redirect flow as required by the provider.
+   */
 
   const handleForgotPassword = () => {
     navigate("/recover-password")

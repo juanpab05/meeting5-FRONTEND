@@ -2,6 +2,18 @@ import { useNavigate } from "react-router";
 import { useState } from "react";
 import { fetchRegisterUser } from "../api/user";
 
+/**
+ * Sign-up page component.
+ *
+ * Renders a registration form and handles client-side validation before
+ * calling the API via `fetchRegisterUser`. On successful registration the
+ * user is redirected to the home page.
+ *
+ * State:
+ * - `formulario`: holds the form fields (first name, last name, email, password, confirmPassword).
+ * - `age`: string-backed input for the age field (converted to number before submit).
+ * - `errorMessage`: error text shown to the user when validation or API fails.
+ */
 export const SignUP: React.FC = () => {
   const [formulario, setFormulario] = useState({ firstName: "", lastName: "", age: 0, email: "", password: "", confirmPassword: "" });
   const [age, setAge] = useState("");
@@ -13,6 +25,11 @@ export const SignUP: React.FC = () => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Handle changes on input fields and sync them into `formulario`.
+   * @param e - Input change event
+   */
+
   const validatePassword = (password: string, confirmPassword: string) => {
     if (password !== confirmPassword) return "Las contraseñas no coinciden.";
     if (password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
@@ -21,6 +38,11 @@ export const SignUP: React.FC = () => {
     if (!/[^A-Za-z0-9]/.test(password)) return "La contraseña debe contener al menos un símbolo.";
     return null;
   };
+
+  /**
+   * Validate password strength and equality.
+   * Returns an error string when validation fails or `null` when valid.
+   */
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -68,6 +90,13 @@ export const SignUP: React.FC = () => {
       }
     }
   };
+
+  /**
+   * Submit handler for the registration form.
+   * - Converts `age` to number and validates inputs.
+   * - Calls `fetchRegisterUser` and redirects on success.
+   * - Displays friendly error messages based on API responses.
+   */
 
   return (
     <div className="w-full min-h-screen bg-meeting5 flex items-center justify-center p-6">

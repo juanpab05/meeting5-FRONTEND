@@ -3,16 +3,23 @@ import { useNavigate } from "react-router";
 import { useUser } from "../context/UserContext";
 import { PropsAuth } from "../schemas/auth";
 
+/**
+ * HeaderButtons component.
+ *
+ * Shows authentication-related actions depending on the `auth` state. When
+ * the user is not authenticated it displays login/register buttons. When
+ * authenticated it exposes quick actions like Create Meeting and Logout.
+ */
 export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, guestUser, setUser, loadingUser, refreshUser } = useUser();
 
-  // ✅ Refrescar usuario solo una vez, no con intervalos
+  // Refresh user once when auth becomes true and user data is missing
   useEffect(() => {
     if (auth && !loadingUser && !user?.firstName) {
-      refreshUser(); // 👈 solo se llama una vez
+      refreshUser();
     }
   }, [auth, user, loadingUser, refreshUser]);
 
@@ -39,11 +46,17 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
     };
   }, []);
 
-  const handleMenu = () => setShowMenu(!showMenu);
+  /** Toggle the small menu on desktop/header. */
+  const handleMenu = () => setShowMenu((s) => !s);
+
+  /**
+   * Logout helper: clears local storage, resets the context user to guest,
+   * updates auth state and navigates to the landing page.
+   */
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setUser(guestUser)
+    setUser(guestUser);
     setAuth(false);
     setShowMenu(false);
     navigate("/");
