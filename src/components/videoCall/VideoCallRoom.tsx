@@ -6,11 +6,48 @@ import { ChatPanel } from "./ChatPanel";
 import { ParticipantsList } from "./ParticipantsList";
 import { useUser } from "../../context/UserContext"; 
 import { useNavigate } from "react-router-dom";
+import { socket, connectRoomSocket, getRoomCount} from "../../sockets/socketManager";
+import { useEffect } from "react";
 
-import type { Participant, ChatMessage, VideoCallRoomProps } from "../../types";
+import type { Participant, ChatMessage, roomCount, VideoCallRoomProps } from "../../types";
+import { toast } from "sonner";
 
 export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const { id } = useParams(); // meetingId desde la URL
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [numParticipants, setNumParticipants] = useState(1);
+
+  useEffect(() => {
+    if (id) {
+      getRoomCount(id);
+      connectRoomSocket(id);
+    }
+    socket.on("room-count", (roomCount: roomCount) => {
+        //console.log(`Current participants in room ${id}: ${roomCount.userIds}`);
+        setNumParticipants(roomCount.uniqueUserCount + 1); // +1 to account for local user
+      });
+    socket.on("new-message", (msg: ChatMessage) => {
+        setChatMessages(prev => [...prev, msg]);
+        //console.log('new-message listeners count', socket.listeners('new-message')?.length);
+      });
+    socket.on("error", (errorMessage: { message: string }) => {
+        console.error("Socket error:", errorMessage);
+        if (errorMessage.message === "Access denied to this meeting") {
+          toast.error("Acceso denegado a esta reunión");
+          handleLeave();
+        } 
+        else if (errorMessage.message === "User already connected from another session") {
+          toast.error("El usuario ya esta conectado a la reunión desde otra página");
+          handleLeave();
+        }
+      });
+    return () => {
+      socket.off('error');
+      socket.off('room-count');
+      socket.off('new-message');
+    };
+  }, [socket]);
+
 
   const navigate = useNavigate();
 
@@ -31,7 +68,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
   // 🔊 Toggle audio
@@ -72,17 +108,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     setShowParticipants(!showParticipants);
   };
 
-  // ✉️ Send chat message
-  const sendMessage = (message: string) => {
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      participantId: "local",
-      participantName: "Tú",
-      message,
-      timestamp: new Date(),
-    };
-    setChatMessages((prev) => [...prev, newMessage]);
-  };
 
   // 🚪 Leave call
   // Si no pasas onLeave desde las rutas, aquí puedes definir el comportamiento por defecto
@@ -90,7 +115,8 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     if (onLeave) {
       onLeave();
     } else {
-      navigate("/"); // 👈 redirige al home al salir
+      socket.emit("leave-room")
+      navigate("/create-meet"); // 👈 redirige al home al salir
     }
   };
 
@@ -101,8 +127,8 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         <div>
           <h1 className="text-white">Sala de Reunión</h1>
           <p className="text-sm text-gray-400">
-            ID: {id} • {participants.length}{" "}
-            {participants.length === 1 ? "participante" : "participantes"}
+            ID: {id} • {numParticipants}{" "}
+            {numParticipants === 1 ? "participante" : "participantes"}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -125,7 +151,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         {showChat && (
           <ChatPanel
             messages={chatMessages}
-            onSendMessage={sendMessage}
             onClose={toggleChat}
           />
         )}

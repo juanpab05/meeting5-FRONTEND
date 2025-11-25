@@ -1,11 +1,23 @@
+/**
+ * Props used to render a generic error component.
+ */
 export interface PropsError {
-    messageError: string
+  /** Human-readable error message to display. */
+  messageError: string;
 }
 
+/**
+ * Options passed to an API error handler utility.
+ *
+ * - `response` is the fetch/HTTP Response object returned by the request.
+ * - `data` may contain a parsed body from the server (if available).
+ * - `location` is an optional label identifying which API or call produced the error.
+ */
 export interface HandleApiErrorOptions {
   response: Response;
   data?: any;
-  location?: string; // name Api 
+  /** Optional identifier for which API or endpoint raised the error. */
+  location?: string;
 }
 
 // {

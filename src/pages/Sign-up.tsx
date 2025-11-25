@@ -2,8 +2,21 @@ import { useNavigate } from "react-router";
 import { useState } from "react";
 import { fetchRegisterUser } from "../api/user";
 
+/**
+ * Sign-up page component.
+ *
+ * Renders a registration form and handles client-side validation before
+ * calling the API via `fetchRegisterUser`. On successful registration the
+ * user is redirected to the home page.
+ *
+ * State:
+ * - `formulario`: holds the form fields (first name, last name, email, password, confirmPassword).
+ * - `age`: string-backed input for the age field (converted to number before submit).
+ * - `errorMessage`: error text shown to the user when validation or API fails.
+ */
 export const SignUP: React.FC = () => {
   const [formulario, setFormulario] = useState({ firstName: "", lastName: "", age: 0, email: "", password: "", confirmPassword: "" });
+  const [age, setAge] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -11,6 +24,11 @@ export const SignUP: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
+
+  /**
+   * Handle changes on input fields and sync them into `formulario`.
+   * @param e - Input change event
+   */
 
   const validatePassword = (password: string, confirmPassword: string) => {
     if (password !== confirmPassword) return "Las contraseñas no coinciden.";
@@ -21,8 +39,15 @@ export const SignUP: React.FC = () => {
     return null;
   };
 
+  /**
+   * Validate password strength and equality.
+   * Returns an error string when validation fails or `null` when valid.
+   */
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    formulario.age = Number(age);
 
     if (formulario.age <= 0 || isNaN(formulario.age)) {
       setErrorMessage("Por favor, ingresa una edad válida.");
@@ -57,7 +82,7 @@ export const SignUP: React.FC = () => {
       } else if (error.message.includes("Unauthorized")) {
         setErrorMessage("No tienes permiso para realizar esta acción.");
       }
-      else if (error.message.includes("Conflict")) {
+      else if (error.message.includes("Email is already registered")) {
         setErrorMessage("El correo electrónico ya está registrado.");
       }
       else {
@@ -65,6 +90,13 @@ export const SignUP: React.FC = () => {
       }
     }
   };
+
+  /**
+   * Submit handler for the registration form.
+   * - Converts `age` to number and validates inputs.
+   * - Calls `fetchRegisterUser` and redirects on success.
+   * - Displays friendly error messages based on API responses.
+   */
 
   return (
     <div className="w-full min-h-screen bg-meeting5 flex items-center justify-center p-6">
@@ -124,11 +156,11 @@ export const SignUP: React.FC = () => {
                   type="text"
                   id="age"
                   name="age"
-                  value={formulario.age}
+                  value={age}
                   placeholder="Edad"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  onChange={handleChange}
+                  onChange={(e) => setAge(e.target.value)}
                 />
                 <label htmlFor="email" className="sr-only">Correo electrónico</label>
                 <input

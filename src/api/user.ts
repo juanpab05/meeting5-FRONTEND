@@ -25,7 +25,7 @@ export async function fetchRegisterUser(params: UserData): Promise<any> {
     });
 
     const data = await response.json();
-
+    console.log("Response data:", data);
     if (!response.ok) {
       await handleApiError({response, data, location: "fetchRegisterUser"});
     }

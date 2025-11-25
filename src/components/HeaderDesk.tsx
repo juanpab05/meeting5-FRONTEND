@@ -3,8 +3,12 @@ import { PropsAuth } from "../schemas/auth";
 import React from "react";
 import { Link, useNavigate } from "react-router";
 
-
-
+/**
+ * Desktop header for the application.
+ *
+ * Displays the logo, navigation links and the auth buttons area. It adapts
+ * to desktop sizes and defers auth actions to `HeaderButtons`.
+ */
 export const Header: React.FC<PropsAuth> = ({ auth, setAuth }) => {
     const navigate = useNavigate();
     const hover = "hover:text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200";

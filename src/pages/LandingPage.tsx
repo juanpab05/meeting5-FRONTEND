@@ -1,11 +1,8 @@
-import { useNavigate } from "react-router";
-
 /**
  * LandingPage Component
  *
  */
 export const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
 
   return (
     <div className="mt-16 flex flex-col w-full justify-center items-center bg-meeting5 overflow-x-hidden">
@@ -94,7 +91,6 @@ export const LandingPage: React.FC = () => {
                 Convertir a esta página en la alternativa para videollamadas mas exitosa.</h1>
             </div>
          
-
           </div>
         </div>
     </div>

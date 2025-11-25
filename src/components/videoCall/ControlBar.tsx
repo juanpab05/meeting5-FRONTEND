@@ -46,9 +46,10 @@ export function ControlBar({
 }: ControlBarProps) {
   return (
     <div className="bg-gray-800 border-t border-gray-700 px-6 py-4">
-      <div className="flex items-center justify-between max-w-7xl mx-auto">
-        {/* Left Controls */}
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between max-w-7xl mx-auto w-full">
+
+        {/* ⭐ Botones centrados: mic, video, salir */}
+        <div className="flex justify-center gap-2 flex-1">
           <Button
             variant={isAudioEnabled ? "circleBlue" : "circleRed"}
             size="circle"
@@ -64,9 +65,14 @@ export function ControlBar({
           >
             {isVideoEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
           </Button>
+
+          <Button variant="pillRed" size="pill" onClick={onLeaveCall}>
+            <PhoneOff className="w-5 h-5" />
+            Salir
+          </Button>
         </div>
 
-        {/* Center Controls */}
+        {/* 📌 Botones alineados a la derecha */}
         <div className="flex items-center gap-2">
           <div className="relative">
             <Button
@@ -74,7 +80,7 @@ export function ControlBar({
               size="circle"
               onClick={onToggleChat}
             >
-              <MessageSquare className="w-5 h-5" />
+              <MessageSquare className="w-5 h-5 text-white" />
             </Button>
             {unreadMessages > 0 && !showChat && (
               <Badge
@@ -92,7 +98,7 @@ export function ControlBar({
               size="circle"
               onClick={onToggleParticipants}
             >
-              <Users className="w-5 h-5" />
+              <Users className="w-5 h-5 bg text-white"/>
             </Button>
             {participantCount > 1 && (
               <Badge
@@ -103,7 +109,7 @@ export function ControlBar({
               </Badge>
             )}
           </div>
-
+          {/* 
           <Button variant="circleBlue" size="circle">
             <Settings className="w-5 h-5" />
           </Button>
@@ -111,18 +117,7 @@ export function ControlBar({
           <Button variant="circleBlue" size="circle">
             <MoreVertical className="w-5 h-5" />
           </Button>
-        </div>
-
-        {/* Right Controls */}
-        <div>
-          <Button
-            variant="pillRed"
-            size="pill"
-            onClick={onLeaveCall}
-          >
-            <PhoneOff className="w-5 h-5" />
-            Salir
-          </Button>
+          */}
         </div>
       </div>
     </div>
