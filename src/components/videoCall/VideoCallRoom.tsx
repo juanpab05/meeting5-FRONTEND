@@ -35,6 +35,10 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         if (errorMessage.message === "Access denied to this meeting") {
           toast.error("Acceso denegado a esta reunión");
           handleLeave();
+        } 
+        else if (errorMessage.message === "User already connected from another session") {
+          toast.error("El usuario ya esta conectado a la reunión desde otra página");
+          handleLeave();
         }
       });
     return () => {
