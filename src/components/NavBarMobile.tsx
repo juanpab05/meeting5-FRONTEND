@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { getToken } from "../api/utils";
 import { ListIcon } from "lucide-react";
 import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router";
 
 /**
  * Mobile navigation panel (slide-out) used on small screens.
@@ -11,6 +12,7 @@ import { useUser } from "../context/UserContext";
  * - `isAuth` (optional): whether the user is authenticated; controls which
  *    navigation items (login/burger-menu vs create-meet/burger-menu) are shown.
  */
+
 export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
   const fila =
     "border-b border-white/20 flex w-full justify-center items-center py-6";
@@ -23,6 +25,17 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
   };
 
   const { setUser, guestUser } = useUser();
+const navigate = useNavigate();
+
+const goToAnchor = (id: string) => {
+  setIsOpen(false);
+  navigate("/"); // primero llévalo a la landing
+
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  }, 50);
+};
 
   /**
    * Clears authentication artifacts and resets context to guest user.
@@ -105,16 +118,18 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
             </>
           )}
           <div className={fila}>
-            <Link to="/#about-us" onClick={() => setIsOpen(false)}>
-              <span className={hover}>Sobre nosotros</span>
-            </Link>
+            <button onClick={() => goToAnchor("about-us")} className={hover}>
+              Sobre nosotros
+            </button>
           </div>
 
+
           <div className={fila}>
-              <Link to="#sitemap" onClick={() => setIsOpen(false)}>
-                <span className={hover}>Mapa del sitio</span>
-              </Link>
+            <button onClick={() => goToAnchor("sitemap")} className={hover}>
+              Mapa del sitio
+            </button>
           </div>
+
         </nav>
       </div>
     </div>

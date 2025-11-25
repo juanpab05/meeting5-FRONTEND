@@ -131,10 +131,21 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
             {numParticipants === 1 ? "participante" : "participantes"}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400">Reunión en curso</span>
-          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-        </div>
+        <div className="flex items-center gap-3">
+  <button
+    onClick={() => {
+      navigator.clipboard.writeText(id || "");
+      toast.success("ID copiado al portapapeles");
+    }}
+    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition"
+  >
+    Copiar ID
+  </button>
+
+  <span className="text-sm text-gray-400">Reunión en curso</span>
+  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+</div>
+
       </div>
 
       {/* Main Content */}
