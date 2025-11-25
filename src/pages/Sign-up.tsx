@@ -18,26 +18,79 @@ export const SignUP: React.FC = () => {
   const [formulario, setFormulario] = useState({ firstName: "", lastName: "", age: 0, email: "", password: "", confirmPassword: "" });
   const [age, setAge] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [ageError, setAgeError] = useState("");
+  const hasErrors =
+  !!passwordError ||
+  !!confirmPasswordError ||
+  !!emailError ||
+  !!ageError ||
+  Object.values(formulario).some((field) => field === "");
 
   const navigate = useNavigate();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormulario({ ...formulario, [e.target.name]: e.target.value });
-  };
 
   /**
    * Handle changes on input fields and sync them into `formulario`.
    * @param e - Input change event
    */
 
-  const validatePassword = (password: string, confirmPassword: string) => {
-    if (password !== confirmPassword) return "Las contraseñas no coinciden.";
+  const validatePassword = (password: string) => {
     if (password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
     if (!/[A-Z]/.test(password)) return "La contraseña debe contener al menos una mayúscula.";
     if (!/[0-9]/.test(password)) return "La contraseña debe contener al menos un número.";
     if (!/[^A-Za-z0-9]/.test(password)) return "La contraseña debe contener al menos un símbolo.";
     return null;
   };
+
+  const validatePasswordEquality = (password: string, confirmPassword: string) => {
+    if (password !== confirmPassword) return "Las contraseñas no coinciden.";
+    return null;
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormulario({ ...formulario, [name]: value });
+
+    if (name === "password") {
+      const error = validatePassword(
+        name === "password" ? value : formulario.password
+      );
+      setPasswordError(error || "");
+    }
+
+    if (name === "confirmPassword") {
+      setConfirmPasswordError(
+        validatePasswordEquality(formulario.password, value) || ""
+      );
+    }
+
+    if (name === "email") {
+      if (!value.includes("@")) {
+        setEmailError("El correo debe contener '@'.");
+      } else if (!value.includes(".")) {
+        setEmailError("El correo debe contener un punto '.'");
+      } else {
+        setEmailError("");
+      }
+    }
+
+  };
+
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAge(value);
+
+    if (Number(value) <= 0 || isNaN(Number(value))) {
+      setAgeError("Debes ingresar una edad válida.");
+    } else {
+      setAgeError("");
+    }
+  };
+
+
 
   /**
    * Validate password strength and equality.
@@ -54,14 +107,14 @@ export const SignUP: React.FC = () => {
       return;
     }
 
-    const error = validatePassword(formulario.password, formulario.confirmPassword);
+    const error = validatePassword(formulario.password);
     if (error) {
       setErrorMessage(error);
       return;
     }
-  
+
     setErrorMessage("");
-    
+
     const userDataSignUP = {
       firstName: formulario.firstName,
       lastName: formulario.lastName,
@@ -160,8 +213,10 @@ export const SignUP: React.FC = () => {
                   placeholder="Edad"
                   required
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  onChange={(e) => setAge(e.target.value)}
+                  onChange={handleAgeChange}
                 />
+                {ageError && <p className="text-red-500 text-xs mb-3">{ageError}</p>}
+
                 <label htmlFor="email" className="sr-only">Correo electrónico</label>
                 <input
                   type="email"
@@ -173,6 +228,7 @@ export const SignUP: React.FC = () => {
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
+                {emailError && <p className="text-red-500 text-xs mb-3">{emailError}</p>}
 
                 <label htmlFor="password" className="sr-only">Contraseña</label>
                 <input
@@ -185,7 +241,9 @@ export const SignUP: React.FC = () => {
                   className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
-
+                {passwordError && (
+                  <p className="text-red-500 text-xs mb-3">{passwordError}</p>
+                )}
 
                 <label htmlFor="confirmPassword" className="sr-only">Confirmar contraseña</label>
                 <input
@@ -198,12 +256,16 @@ export const SignUP: React.FC = () => {
                   className="mb-3 bg-white rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={handleChange}
                 />
+                {confirmPasswordError && (
+                  <p className="text-red-500 text-xs mb-3">{confirmPasswordError}</p>
+                )}
               </div>
             </div>
 
             <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
               <button
                 type="submit"
+                disabled={hasErrors}
                 className="w-full bg-[#1D4ED8] hover:bg-[#1943B8] text-xl text-white font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 Registrarse
