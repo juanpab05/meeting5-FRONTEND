@@ -5,17 +5,17 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Card } from "../ui/card";
 import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
-interface JoinMeetingProps {
-  onJoinMeeting: (meetingId: string) => void;
-}
 
-export function JoinMeeting({ onJoinMeeting }: JoinMeetingProps) {
+
+export function JoinMeeting() {
   const [meetingId, setMeetingId] = useState("");
+  const navigate = useNavigate();
 
   const handleJoinMeeting = () => {
     if (meetingId.trim()) {
-      onJoinMeeting(meetingId);
+      navigate(`/meeting/${meetingId.trim()}`);
       toast.success("Uniéndose a la reunión...");
     } else {
       toast.error("Por favor ingresa un ID de reunión válido");

@@ -19,7 +19,6 @@ export function ChatPanel({
 }: ChatPanelProps) {
   const [userName, setUserName] = useState("");
   const [input, setInput] = useState("");
-
   const userData = localStorage.getItem("user");
   if (!userData) {
     throw new Error("User data not found in localStorage");
@@ -77,7 +76,7 @@ export function ChatPanel({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 overflow-y-scroll justify-end" id="chat-container">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 mt-8">
             <p>No hay mensajes aún</p>
