@@ -21,7 +21,7 @@ export function ChatPanel({
   const [input, setInput] = useState("");
 
   const userData = localStorage.getItem("user");
-  if (!userData){
+  if (!userData) {
     throw new Error("User data not found in localStorage");
   }
 
@@ -85,21 +85,37 @@ export function ChatPanel({
           </div>
         ) : (
           <div className="space-y-4">
-            {messages.map((message) => (
-              <div key={message.id} className="space-y-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm text-white">
-                    {message.userName}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {formatTime(new Date(message.timestamp))}
-                  </span>
+            {messages.map((message) => {
+              const isOwn = message.userId === parsedData.id;
+
+              return (
+                <div
+                  key={message.id}
+                  className={`space-y-1 flex ${isOwn ? "justify-end" : "justify-start"}`}
+                >
+                  <div className="max-w-[75%]">
+                    <div className="flex items-baseline gap-2">
+                      {!isOwn && (
+                        <span className="text-sm text-white">{message.userName}</span>
+                      )}
+                      <span className="text-xs text-gray-500">
+                        {formatTime(new Date(message.timestamp))}
+                      </span>
+                    </div>
+
+                    <div
+                      className={`rounded-lg p-3 ${isOwn
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-700 text-gray-200"
+                        }`}
+                    >
+                      <p className="text-sm">{message.content}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-gray-700 rounded-lg p-3">
-                  <p className="text-sm text-gray-200">{message.content}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
+
           </div>
         )}
       </ScrollArea>
