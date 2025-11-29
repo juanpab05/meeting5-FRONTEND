@@ -1,9 +1,10 @@
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { useUser } from "../context/UserContext"
 import { fetchLoginUser } from "../api/login"
+import useAuthStore from "../stores/useAuthStore";
 
 /**
  * Login page component.
@@ -21,8 +22,10 @@ export const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const {refreshUser} = useUser();
-
+  
+  const { user } = useAuthStore()
   const navigate = useNavigate();
+  const { loginWithGoogle, loginWithFacebook, initAuthObserver } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value })
@@ -65,18 +68,37 @@ export const LoginPage = () => {
    * - Updates error state on failure and toggles loading flag.
    */
 
-  const handleFacebookLogin = () => {
-    // Implement Facebook login logic here - aqui que iria teniendo en cuenta que usamos typescript
-  }
+  const handleFacebookLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+      try {
+        await loginWithFacebook();
+        //navigate("/UserProfilePage");
+      } catch (error: any) {
+        console.error("Facebook login error:", error);
+        setErrorMessage("Ocurrió un problema con Facebook. Intenta nuevamente.");
+      }
+  };
 
-  const handleGoogleLogin = () => {
-    // Implement Google login logic here - aqui que iria teniendo en cuenta que usamos typescript
-  }
-
+  const handleGoogleLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+      try {
+        await loginWithGoogle();
+        //navigate("/UserProfilePage");
+      } catch (error: any) {
+        console.error("Google login error:", error);
+        setErrorMessage("Ocurrió un problema con Google. Intenta nuevamente.");
+      }
+      console.log(user);
+  };
   /**
    * Placeholder: handle third-party login (Facebook).
    * Implement OAuth popup/redirect flow as required by the provider.
    */
+
+  useEffect(() => {
+    const unsub = initAuthObserver(); 
+    return () => unsub();
+  }, [initAuthObserver]); 
 
   /**
    * Placeholder: handle third-party login (Google).
