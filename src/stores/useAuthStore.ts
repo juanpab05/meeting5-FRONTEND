@@ -10,16 +10,20 @@ interface User {
 type AuthStore = {
     user: User | null;
     setUser: (user: User | null) => void;
+    clearUser: () => void;
     initAuthObserver: () => () => void;
     loginWithGoogle: () => Promise<void>;
     loginWithFacebook: () => Promise<void>;
     logout: () => Promise<void>;
+    loginWithEmail: (email: string, password: string) => Promise<void>;
 };
 
 const useAuthStore = create<AuthStore>((set) => ({
     user: null,
 
     setUser: (user) => set({ user }),
+
+    clearUser: () => set({ user: null }),
 
     initAuthObserver: () => {
         const unsubscribe = onAuthStateChanged(
@@ -76,5 +80,7 @@ const useAuthStore = create<AuthStore>((set) => ({
         }
     }
 }));
+
+export const clearAuthUser = () => useAuthStore.getState().clearUser();
 
 export default useAuthStore;

@@ -4,7 +4,7 @@ import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { useUser } from "../context/UserContext"
 import { fetchGoogleLogin, fetchLoginUser } from "../api/login"
-import useAuthStore from "../stores/useAuthStore";
+import useAuthStore, { clearAuthUser } from "../stores/useAuthStore";
 import { toast } from "sonner"
 
 /**
@@ -24,7 +24,6 @@ export const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const {refreshUser} = useUser();
   
-  const { user } = useAuthStore()
   const navigate = useNavigate();
   const { loginWithGoogle, loginWithFacebook, initAuthObserver } = useAuthStore();
 
@@ -84,6 +83,7 @@ export const LoginPage = () => {
     e.preventDefault();
       try {
         await loginWithGoogle();
+        const user = useAuthStore.getState().user;
         if (user){
           console.log(user);
           const data = await fetchGoogleLogin(user.displayName || "", user.email || "");
@@ -91,16 +91,16 @@ export const LoginPage = () => {
             localStorage.setItem('token', data.data.token);
             localStorage.setItem('user', JSON.stringify(data.data.user));
             refreshUser();
-            console.log(data.message);
+
             if(data.message==='User registered successfully'){
-              toast.success("Cuenta creada, contraseña por defecto: 1234")
+              toast.success("Cuenta creada")
             } else {
               toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
             }
             navigate("/create-meet");
           }
         }
-        
+      clearAuthUser()
       } catch (error: any) {
         console.error("Google login error:", error);
         setErrorMessage("Ocurrió un problema con Google. Intenta nuevamente.");
