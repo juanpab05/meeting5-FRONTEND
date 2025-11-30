@@ -61,7 +61,7 @@ export function getIdUser(): string {
 }
 
 export async function handleApiError({ response, data, location }: HandleApiErrorOptions): Promise<never> {
-  let errorMessage = data?.error || "Ocurrió un error inesperado.";
+  let errorMessage = data?.message || "Ocurrió un error inesperado.";
 
   // Messages
   switch (response.status) {

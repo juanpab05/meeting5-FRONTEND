@@ -26,14 +26,14 @@ export async function fetchLoginUser(email: string, password: string): Promise<a
     const data = await response.json();
 
     if (!response.ok) {
-      await handleApiError({response, location: "fetchLoginUser"});
+      await handleApiError({response, data, location: "fetchLoginUser"});
     }
 
     if (location) {
       console.log("[fetchLoginUser] User logged in successfully:", data);
     }
 
-    return data.data;
+    return data;
   } catch (error) {
     if (location) {
       console.error("[fetchLoginUser] Unexpected error:", error);
@@ -43,6 +43,31 @@ export async function fetchLoginUser(email: string, password: string): Promise<a
   }
 }
 
+export async function fetchGoogleLogin(userName: string, email: string): Promise<any> {
+  try {
+    const response = await fetch(`${API}/users/google-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userName, email }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      await handleApiError({response, location: "fetchGoogleLogin"});
+    }
+    if (location) {
+      console.log("[fetchGoogleLogin] User logged in successfully:", data);
+    }
+    return data;
+  }
+  catch (error) {
+    if (location) {
+      console.error("[fetchGoogleLogin] Unexpected error:", error);
+    }
+  }
+}
 /**
  * @async
  * @function fetchToken

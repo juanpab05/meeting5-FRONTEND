@@ -1,9 +1,11 @@
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { useUser } from "../context/UserContext"
-import { fetchLoginUser } from "../api/login"
+import { fetchGoogleLogin, fetchLoginUser } from "../api/login"
+import useAuthStore, { clearAuthUser } from "../stores/useAuthStore";
+import { toast } from "sonner"
 
 /**
  * Login page component.
@@ -21,8 +23,9 @@ export const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const {refreshUser} = useUser();
-
+  
   const navigate = useNavigate();
+  const { loginWithGoogle, loginWithFacebook, initAuthObserver } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value })
@@ -41,14 +44,14 @@ export const LoginPage = () => {
     try {
       const data = await fetchLoginUser(formulario.email, formulario.password)
 
-      if (data.token) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
+      if (data.data.token) {
+        localStorage.setItem('token', data.data.token)
+        localStorage.setItem('user', JSON.stringify(data.data.user))
         refreshUser();
       }
 
       setFormulario({ email: "", password: "" })
-      
+      toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
       navigate("/create-meet");
         
     } catch (error: any) {
@@ -65,18 +68,53 @@ export const LoginPage = () => {
    * - Updates error state on failure and toggles loading flag.
    */
 
-  const handleFacebookLogin = () => {
-    // Implement Facebook login logic here - aqui que iria teniendo en cuenta que usamos typescript
-  }
+  const handleFacebookLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+      try {
+        await loginWithFacebook();
+        //navigate("/UserProfilePage");
+      } catch (error: any) {
+        console.error("Facebook login error:", error);
+        setErrorMessage("Ocurrió un problema con Facebook. Intenta nuevamente.");
+      }
+  };
 
-  const handleGoogleLogin = () => {
-    // Implement Google login logic here - aqui que iria teniendo en cuenta que usamos typescript
-  }
+  const handleGoogleLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+      try {
+        await loginWithGoogle();
+        const user = useAuthStore.getState().user;
+        if (user){
+          console.log(user);
+          const data = await fetchGoogleLogin(user.displayName || "", user.email || "");
+          if (data.data.token) {
+            localStorage.setItem('token', data.data.token);
+            localStorage.setItem('user', JSON.stringify(data.data.user));
+            refreshUser();
 
+            if(data.message==='User registered successfully'){
+              toast.success("Cuenta creada")
+            } else {
+              toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
+            }
+            navigate("/create-meet");
+          }
+        }
+      clearAuthUser()
+      } catch (error: any) {
+        console.error("Google login error:", error);
+        setErrorMessage("Ocurrió un problema con Google. Intenta nuevamente.");
+      }
+  };
   /**
    * Placeholder: handle third-party login (Facebook).
    * Implement OAuth popup/redirect flow as required by the provider.
    */
+
+  useEffect(() => {
+    const unsub = initAuthObserver(); 
+    return () => unsub();
+  }, [initAuthObserver]); 
 
   /**
    * Placeholder: handle third-party login (Google).
