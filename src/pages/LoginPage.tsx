@@ -3,8 +3,9 @@ import { useEffect, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { useUser } from "../context/UserContext"
-import { fetchLoginUser } from "../api/login"
+import { fetchGoogleLogin, fetchLoginUser } from "../api/login"
 import useAuthStore from "../stores/useAuthStore";
+import { toast } from "sonner"
 
 /**
  * Login page component.
@@ -44,14 +45,14 @@ export const LoginPage = () => {
     try {
       const data = await fetchLoginUser(formulario.email, formulario.password)
 
-      if (data.token) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
+      if (data.data.token) {
+        localStorage.setItem('token', data.data.token)
+        localStorage.setItem('user', JSON.stringify(data.data.user))
         refreshUser();
       }
 
       setFormulario({ email: "", password: "" })
-      
+      toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
       navigate("/create-meet");
         
     } catch (error: any) {
@@ -83,12 +84,27 @@ export const LoginPage = () => {
     e.preventDefault();
       try {
         await loginWithGoogle();
-        //navigate("/UserProfilePage");
+        if (user){
+          console.log(user);
+          const data = await fetchGoogleLogin(user.displayName || "", user.email || "");
+          if (data.data.token) {
+            localStorage.setItem('token', data.data.token);
+            localStorage.setItem('user', JSON.stringify(data.data.user));
+            refreshUser();
+            console.log(data.message);
+            if(data.message==='User registered successfully'){
+              toast.success("Cuenta creada, contraseña por defecto: 1234")
+            } else {
+              toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
+            }
+            navigate("/create-meet");
+          }
+        }
+        
       } catch (error: any) {
         console.error("Google login error:", error);
         setErrorMessage("Ocurrió un problema con Google. Intenta nuevamente.");
       }
-      console.log(user);
   };
   /**
    * Placeholder: handle third-party login (Facebook).
