@@ -52,10 +52,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
    */
   const fetchUser = async () => {
     if (getToken() !== null) {
+      console.log(getToken())
       try {
         const response = await fetchUserProfile();
+        console.log("Response: ",response)
         if (response) {
           setUser({ ...response.data });
+          console.log(response.data)
         } else {
           setUser(guestUser); // 👈 fallback si el perfil no existe
         }

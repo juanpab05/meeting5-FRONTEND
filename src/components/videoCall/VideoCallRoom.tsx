@@ -31,12 +31,14 @@ interface ParticipantWithStream extends Participant {
 export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const { id } = useParams(); // meetingId desde la URL
   const navigate = useNavigate();
+  const userData = localStorage.getItem("user");
+  if (!userData) {
+    throw new Error("User data not found in localStorage");
+  }
+  const parsedData = JSON.parse(userData);
   const { user } = useUser();
 
-  const selfName = useMemo(
-    () => (user ? `${user.firstName} ${user.lastName}` : "Invitado"),
-    [user]
-  );
+  const selfName =  `${parsedData.firstName} ${parsedData.lastName}`
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [numParticipants, setNumParticipants] = useState(1);
