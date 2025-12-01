@@ -25,7 +25,6 @@ export function RecoverPassword() {
     setIsLoading(true);
 
     try {
-      // 👇 Usamos la función centralizada
       const data = await fetchRecoverPassword(email);
 
       if (data.success) {
@@ -45,12 +44,21 @@ export function RecoverPassword() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200 w-full max-w-[630px]">
+
+        {/* Encabezado accesible */}
+        <h1 className="sr-only">Recuperar contraseña</h1>
+
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-[#60A5FA]/10 flex items-center justify-center">
-            <Mail className="w-5 h-5 text-[#60A5FA]" />
+          <div
+            className="w-10 h-10 rounded-lg bg-[#60A5FA]/10 flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <Mail className="w-5 h-5 text-[#60A5FA]" aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-[#1F2937] text-lg font-semibold">Recuperar contraseña</h2>
+            <h2 className="text-[#1F2937] text-lg font-semibold">
+              Recuperar contraseña
+            </h2>
             <p className="text-sm text-[#1F2937]/60">
               Recibe un enlace para restablecer tu contraseña
             </p>
@@ -59,8 +67,10 @@ export function RecoverPassword() {
 
         {!emailSent ? (
           <form onSubmit={handleSubmit} className="space-y-4">
+
             <div className="space-y-2">
               <Label htmlFor="recovery-email">Correo electrónico</Label>
+
               <Input
                 id="recovery-email"
                 type="email"
@@ -68,8 +78,10 @@ export function RecoverPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@correo.com"
                 required
+                aria-describedby="email-helper-text"
               />
-              <p className="text-xs text-[#1F2937]/60">
+
+              <p id="email-helper-text" className="text-xs text-[#1F2937]/60">
                 Te enviaremos un enlace para restablecer tu contraseña
               </p>
             </div>
@@ -78,22 +90,35 @@ export function RecoverPassword() {
               type="submit"
               disabled={isLoading}
               className="w-full bg-[#1D4ED8] hover:bg-[#1943B8] text-white"
+              aria-busy={isLoading}
+              aria-label={
+                isLoading
+                  ? "Enviando enlace de recuperación..."
+                  : "Enviar enlace de recuperación"
+              }
             >
-              <Send className="w-4 h-4 mr-2" />
+              <Send className="w-4 h-4 mr-2" aria-hidden="true" />
               {isLoading ? "Enviando..." : "Enviar enlace de recuperación"}
             </Button>
           </form>
         ) : (
           <div className="space-y-4">
-            <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 rounded-lg p-4">
+
+            {/* Mensaje accesible de éxito */}
+            <div
+              className="bg-[#22C55E]/10 border border-[#22C55E]/20 rounded-lg p-4"
+              role="status"
+              aria-live="polite"
+            >
               <div className="flex gap-3">
-                <Mail className="w-5 h-5 text-[#22C55E] flex-shrink-0 mt-0.5" />
+                <Mail className="w-5 h-5 text-[#22C55E] flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <p className="text-sm text-[#1F2937] mb-1 font-medium">
                     Correo enviado exitosamente
                   </p>
                   <p className="text-sm text-[#1F2937]/70">
-                    Hemos enviado un enlace de recuperación a <strong>{email}</strong>. Revisa tu bandeja de entrada y carpeta de spam.
+                    Hemos enviado un enlace de recuperación a <strong>{email}</strong>. 
+                    Revisa tu bandeja de entrada y carpeta de spam.
                   </p>
                 </div>
               </div>

@@ -22,8 +22,8 @@ export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const {refreshUser} = useUser();
-  
+  const { refreshUser } = useUser();
+
   const navigate = useNavigate();
   const { loginWithGoogle, loginWithFacebook, initAuthObserver } = useAuthStore();
 
@@ -53,7 +53,7 @@ export const LoginPage = () => {
       setFormulario({ email: "", password: "" })
       toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
       navigate("/create-meet");
-        
+
     } catch (error: any) {
       console.error('Error en login:', error)
       setErrorMessage(error.message || "No se pudo iniciar sesión. Verifica tus datos.")
@@ -70,56 +70,45 @@ export const LoginPage = () => {
 
   const handleFacebookLogin = async (e: React.MouseEvent) => {
     e.preventDefault();
-      try {
-        await loginWithFacebook();
-        //navigate("/UserProfilePage");
-      } catch (error: any) {
-        console.error("Facebook login error:", error);
-        setErrorMessage("Ocurrió un problema con Facebook. Intenta nuevamente.");
-      }
+    try {
+      await loginWithFacebook();
+    } catch (error: any) {
+      console.error("Facebook login error:", error);
+      setErrorMessage("Ocurrió un problema con Facebook. Intenta nuevamente.");
+    }
   };
 
   const handleGoogleLogin = async (e: React.MouseEvent) => {
     e.preventDefault();
-      try {
-        await loginWithGoogle();
-        const user = useAuthStore.getState().user;
-        if (user){
-          console.log(user);
-          const data = await fetchGoogleLogin(user.displayName || "", user.email || "");
-          if (data.data.token) {
-            localStorage.setItem('token', data.data.token);
-            localStorage.setItem('user', JSON.stringify(data.data.user));
-            refreshUser();
+    try {
+      await loginWithGoogle();
+      const user = useAuthStore.getState().user;
+      if (user) {
+        const data = await fetchGoogleLogin(user.displayName || "", user.email || "");
+        if (data.data.token) {
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
+          refreshUser();
 
-            if(data.message==='User registered successfully'){
-              toast.success("Cuenta creada")
-            } else {
-              toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
-            }
-            navigate("/create-meet");
+          if (data.message === 'User registered successfully') {
+            toast.success("Cuenta creada")
+          } else {
+            toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
           }
+          navigate("/create-meet");
         }
-      clearAuthUser()
-      } catch (error: any) {
-        console.error("Google login error:", error);
-        setErrorMessage("Ocurrió un problema con Google. Intenta nuevamente.");
       }
+      clearAuthUser()
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      setErrorMessage("Ocurrió un problema con Google. Intenta nuevamente.");
+    }
   };
-  /**
-   * Placeholder: handle third-party login (Facebook).
-   * Implement OAuth popup/redirect flow as required by the provider.
-   */
 
   useEffect(() => {
-    const unsub = initAuthObserver(); 
+    const unsub = initAuthObserver();
     return () => unsub();
-  }, [initAuthObserver]); 
-
-  /**
-   * Placeholder: handle third-party login (Google).
-   * Implement OAuth popup/redirect flow as required by the provider.
-   */
+  }, [initAuthObserver]);
 
   const handleForgotPassword = () => {
     navigate("/recover-password")
@@ -130,10 +119,15 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="w-full h-screen bg-meeting5 flex items-center justify-center p-6">
+    <div
+      className="w-full h-screen bg-meeting5 flex items-center justify-center p-6"
+      role="main"
+      aria-label="Página de inicio de sesión"
+    >
+
       {/* Login card */}
       <div className="w-full md:w-full lg:w-1/2 xl:w-1/3 flex flex-col max-w-md md:max-w-lg lg:max-w-2xl bg-white rounded-xl shadow-xl overflow-hidden">
-        {/* Card Content */}
+
         <div className="w-full overflow-hidden items-center justify-center p-8 md:p-12 lg:px-16 lg:py-12">
           {/* Logo */}
           <div className="flex justify-center mb-8">
@@ -142,26 +136,39 @@ export const LoginPage = () => {
               aria-label="Ir a la página de inicio"
               className="cursor-pointer"
             >
-                <img src="logo.svg" className="w-28 rounded-xl" alt="Logo de meeting5" />
+              <img src="logo.svg" className="w-28 rounded-xl" alt="Logo de meeting5" />
             </button>
           </div>
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-black text-3xl lg:text-4xl font-bold text-shadow-lg">Iniciar sesión</h1>
+            <h1 className="text-black text-3xl lg:text-4xl font-bold text-shadow-lg">
+              Iniciar sesión
+            </h1>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            role="form"
+            aria-describedby="form-info"
+          >
+
             {/* Email field */}
             <div>
+              <label htmlFor="email" className="sr-only">
+                Correo electrónico
+              </label>
               <input
+                id="email"
                 type="email"
                 name="email"
                 value={formulario.email}
                 placeholder="Correo electrónico"
                 required
                 disabled={isLoading}
+                aria-required="true"
                 className="rounded-xl border border-gray-400 h-12 px-5 text-base text-black placeholder-gray-500 outline-none w-full focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 onChange={handleChange}
               />
@@ -169,31 +176,40 @@ export const LoginPage = () => {
 
             {/* Password field */}
             <div className="relative">
+              <label htmlFor="password" className="sr-only">
+                Contraseña
+              </label>
               <input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 name="password"
                 value={formulario.password}
                 placeholder="Contraseña"
                 required
                 disabled={isLoading}
-                className="w-full px-3 py-3 border border-gray-400 rounded-xl dark:bg-gray-700 placeholder-gray-500 text-black dark:text-black focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                aria-required="true"
+                className="w-full px-3 py-3 border border-gray-400 rounded-xl placeholder-gray-500 text-black focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 onChange={handleChange}
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isLoading}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50"
               >
                 {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
               </button>
             </div>
 
-
             {/* Error message */}
             {errorMessage && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                <p className="text-red-400 text-sm text-center">{errorMessage}</p>
+              <div
+                className="bg-red-500/10 border border-red-500/20 rounded-lg p-3"
+                role="alert"
+              >
+                <p className="text-red-600 text-sm text-center">{errorMessage}</p>
               </div>
             )}
 
@@ -208,52 +224,53 @@ export const LoginPage = () => {
           </form>
 
           {/* Forgot password link */}
-            <div className="mt-3 text-center">
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                disabled={isLoading}
-                className= "text-center text-gray-500 hover:text-blue-500 text-sm transition-colors disabled:opacity-50"
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-          
-          {/* Social login buttons */}
-          <div className="mt-4 flex flex-col gap-6">
-            {/* Facebook login button */}
-              <button
-                type="submit"
-                onClick={handleFacebookLogin}
-                disabled={isLoading}
-                className="w-full bg-[#E6E6E6] hover:bg-[#CCCCCC] text-xl text-[#1D4ED8] font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                <img src="facebook-logo.png" alt="Logo de Facebook" className="inline-block w-6 h-6 mr-2 align-middle" />
-                Ingresar
-              </button>
-
-            {/* Google login button */}
-              <button
-                type="submit"
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-                className="w-full bg-[#E6E6E6] hover:bg-[#CCCCCC] text-xl text-[#32A753] font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                <img src="google-logo.png" alt="Logo de Google" className="inline-block w-6 h-6 mr-2 align-middle" />
-                Ingresar
+          <div className="mt-3 text-center">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={isLoading}
+              className="text-center text-gray-600 hover:text-blue-500 text-sm transition-colors disabled:opacity-50"
+            >
+              ¿Olvidaste tu contraseña?
             </button>
           </div>
 
-          {/* Sign up link */}
-          <div className="flex flex-wrap justify-center gap-2 mt-8 text-gray-300">
-            <button 
-              onClick={handleSignUp} 
+          {/* Social login buttons */}
+          <div className="mt-4 flex flex-col gap-6">
+
+            {/* Facebook login */}
+            <button
+              onClick={handleFacebookLogin}
               disabled={isLoading}
-              className="text-gray-500 hover:text-blue-500 text-sm transition-colors disabled:opacity-50"
->
-              ¿No tienes una cuenta? Regístrate
+              aria-label="Ingresar con Facebook"
+              className="w-full bg-[#E6E6E6] hover:bg-[#CCCCCC] text-xl text-[#1D4ED8] font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <img src="facebook-logo.png" alt="Logo de Facebook" className="inline-block w-6 h-6 mr-2 align-middle" />
+              Ingresar
             </button>
 
+            {/* Google login */}
+            <button
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+              aria-label="Ingresar con Google"
+              className="w-full bg-[#E6E6E6] hover:bg-[#CCCCCC] text-xl text-[#32A753] font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <img src="google-logo.png" alt="Logo de Google" className="inline-block w-6 h-6 mr-2 align-middle" />
+              Ingresar
+            </button>
+          </div>
+
+          {/* SignUp link */}
+          <div className="flex flex-wrap justify-center gap-2 mt-8">
+            <button
+              onClick={handleSignUp}
+              disabled={isLoading}
+              className="text-gray-600 hover:text-blue-500 text-sm transition-colors disabled:opacity-50"
+              aria-label="Registrarse en la plataforma"
+            >
+              ¿No tienes una cuenta? Regístrate
+            </button>
           </div>
         </div>
       </div>
