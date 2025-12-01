@@ -29,7 +29,7 @@ interface ParticipantWithStream extends Participant {
 }
 
 export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
-  const { id } = useParams(); // meetingId desde la URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useUser();
 
@@ -42,7 +42,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const [numParticipants, setNumParticipants] = useState(1);
   const [peerStreams, setPeerStreams] = useState<Record<string, MediaStream>>({});
 
-  // Estado de participantes (local + remotos)
   const [participants, setParticipants] = useState<ParticipantWithStream[]>(() => {
     const selfId = user?._id || getSelfSocketId() || "local";
     return [
@@ -63,7 +62,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const [showParticipants, setShowParticipants] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
-  // Inicialización de WebRTC y Signaling
+  // WebRTC + Sockets
   useEffect(() => {
     initWebRTC();
 
@@ -72,7 +71,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       setParticipants((prev) => {
         const index = prev.findIndex((p) => p.id === peerId);
         if (index !== -1) {
-          // Actualizar el participante existente con el stream
           const updated = [...prev];
           updated[index] = {
             ...updated[index],
@@ -82,7 +80,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
           };
           return updated;
         }
-        // Agregar nuevo participante
+
         return [
           ...prev,
           {
@@ -95,10 +93,8 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
           },
         ];
       });
-      
     });
 
-    // Conexión/desconexión de peers (sin stream aún)
     setOnPeerConnected((peerId: string) => {
       console.log(`[peer ${peerId}] conectado`);
     });
@@ -112,19 +108,27 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       });
     });
 
-    // Conexión al socket de la sala (chat/conteo)
     if (id) {
       getRoomCount(id);
       connectRoomSocket(id);
     }
 
     socket.on("room-count", (roomCount: roomCount) => {
-      setNumParticipants(roomCount.uniqueUserCount + 1); // +1 local user
+      setNumParticipants(roomCount.uniqueUserCount + 1);
     });
+
     socket.on("new-message", (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev, msg]);
+
+      // ARIA Live region for screen readers
+      const liveRegion = document.getElementById("sr-message-updates");
+      if (liveRegion) {
+        liveRegion.textContent = `Nuevo mensaje de ${msg.userName}: ${msg.content}`;
+      }
+
       if (!showChat) setUnreadMessages((u) => u + 1);
     });
+
     socket.on("error", (errorMessage: { message: string }) => {
       console.error("Socket error:", errorMessage);
       if (errorMessage.message === "Access denied to this meeting") {
@@ -143,13 +147,8 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     };
   }, [id]);
 
-  // Toggles de audio/video
   const toggleAudio = () => {
-    if (isAudioEnabled) {
-      disableOutgoingStream();
-    } else {
-      enableOutgoingStream();
-    }
+    isAudioEnabled ? disableOutgoingStream() : enableOutgoingStream();
     setIsAudioEnabled(!isAudioEnabled);
     setParticipants((prev) =>
       prev.map((p) => (p.isLocal ? { ...p, audioEnabled: !isAudioEnabled } : p))
@@ -157,11 +156,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   };
 
   const toggleVideo = () => {
-    if (isVideoEnabled) {
-      disableOutgoingVideo();
-    } else {
-      enableOutgoingVideo();
-    }
+    isVideoEnabled ? disableOutgoingVideo() : enableOutgoingVideo();
     setIsVideoEnabled(!isVideoEnabled);
     setParticipants((prev) =>
       prev.map((p) => (p.isLocal ? { ...p, videoEnabled: !isVideoEnabled } : p))
@@ -177,7 +172,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     setShowParticipants(!showParticipants);
   };
 
-  // Salir de la llamada (cleanup)
   const handleLeave = () => {
     try {
       closeAllPeers();
@@ -185,6 +179,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     } catch (e) {
       console.warn("Cleanup error:", e);
     }
+
     if (onLeave) {
       onLeave();
     } else {
@@ -193,7 +188,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     }
   };
 
-  // Inyectar streams reales
   const uniqueParticipants = participants.reduce((acc, curr) => {
     if (!acc.some((p) => p.id === curr.id)) {
       acc.push(curr);
@@ -207,47 +201,74 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   }));
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900">
+    <div className="h-screen flex flex-col bg-gray-900" role="main" aria-label="Sala de videollamada">
+
+      {/* Región ARIA para mensajes nuevos */}
+      <div
+        id="sr-message-updates"
+        aria-live="polite"
+        className="sr-only"
+      ></div>
+
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
+      <div
+        className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700"
+        role="banner"
+      >
         <div>
           <h1 className="text-white">Sala de Reunión</h1>
-          <p className="text-sm text-gray-400">
-            ID: {id} • {numParticipants} {numParticipants === 1 ? "participante" : "participantes"}
+          <p className="text-sm text-gray-400" aria-label={`ID de reunión: ${id}`}>
+            ID: {id} •
+            <span aria-label={`Hay ${numParticipants} participantes`}>
+              {" "}
+              {numParticipants} {numParticipants === 1 ? "participante" : "participantes"}
+            </span>
           </p>
         </div>
+
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
               navigator.clipboard.writeText(id || "");
               toast.success("ID copiado al portapapeles");
             }}
+            aria-label="Copiar ID de la reunión al portapapeles"
             className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition"
           >
             Copiar ID
           </button>
+
           <span className="text-sm text-gray-400">Reunión en curso</span>
-          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+
+          {/* Indicador accesible */}
+          <div
+            className="w-2 h-2 bg-red-500 rounded-full animate-pulse"
+            aria-hidden="true"
+          ></div>
+          <span className="sr-only">La reunión está activa</span>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Video Grid */}
-        <div className="flex-1 p-4">
+
+        <div className="flex-1 p-4" aria-label="Rejilla de video">
           <VideoGrid participants={participantsWithStreams} />
         </div>
 
-        {/* Chat Panel */}
-        {showChat && <ChatPanel messages={chatMessages} onClose={toggleChat} />}
+        {showChat && (
+          <div role="complementary" aria-label="Panel de chat">
+            <ChatPanel messages={chatMessages} onClose={toggleChat} />
+          </div>
+        )}
 
-        {/* Participants Panel */}
         {showParticipants && (
-          <ParticipantsList participants={participants} onClose={toggleParticipants} />
+          <div role="complementary" aria-label="Lista de participantes">
+            <ParticipantsList participants={participants} onClose={toggleParticipants} />
+          </div>
         )}
       </div>
 
-      {/* Control Bar */}
       <ControlBar
         isAudioEnabled={isAudioEnabled}
         isVideoEnabled={isVideoEnabled}

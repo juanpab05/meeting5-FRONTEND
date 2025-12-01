@@ -4,79 +4,79 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
-import React from "react";
 import { useUser } from "../../context/UserContext";
 import { fetchUpdateUserProfile } from "../../api/user";
 
 export function EditProfile() {
   const { user, refreshUser } = useUser();
-  const [formData, setFormData] = useState(() => ({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    age: user?.age?.toString() || "",
-    email: user?.email || "",
-    password: "••••••••"
-  }));
+
+  // ---------- FORM DATA ----------
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    age: "",
+    email: "",
+    password: "••••••••",
+  });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [updated, setUpdated] = useState(false); // 👈 flag para controlar actualización
 
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  // 👇 Solo sincroniza el formulario cuando realmente se actualizó el perfil
+  // ---------- SINCRONIZAR DATOS DEL USUARIO ----------
   useEffect(() => {
-    if (user && updated) {
+    if (user) {
       setFormData({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         age: user.age?.toString() || "",
         email: user.email || "",
-        password: "••••••••"
+        password: "••••••••",
       });
-      setUpdated(false); // reset flag
     }
-  }, [user, updated]);
+  }, [user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // ---------- HANDLERS ----------
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
-    // Validaciones
+  const validateForm = () => {
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       toast.error("Nombres y apellidos son obligatorios");
-      return;
+      return false;
     }
 
     if (!formData.email.includes("@")) {
       toast.error("Ingresa un correo electrónico válido");
-      return;
+      return false;
     }
 
     const age = parseInt(formData.age);
     if (isNaN(age) || age < 13 || age > 120) {
       toast.error("La edad debe estar entre 13 y 120 años");
-      return;
+      return false;
     }
 
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
     setIsLoading(true);
+
     try {
       await fetchUpdateUserProfile({
         firstName: formData.firstName,
         lastName: formData.lastName,
-        age: formData.age ? age : undefined,
+        age: parseInt(formData.age),
         email: formData.email,
       });
 
       toast.success("Perfil actualizado correctamente ✅");
 
-      // refrescar datos en el contexto
       await refreshUser();
-      setUpdated(true); // 👈 activa el flag para que el useEffect sincronice
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
       toast.error("Error al actualizar el perfil");
     } finally {
@@ -84,6 +84,20 @@ export function EditProfile() {
     }
   };
 
+  const handleCancel = () => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        age: user.age?.toString() || "",
+        email: user.email || "",
+        password: "••••••••",
+      });
+    }
+    toast.info("Cambios descartados");
+  };
+
+  // ---------- UI ----------
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       <div className="flex items-center gap-3 mb-6">
@@ -97,12 +111,12 @@ export function EditProfile() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* nombres / apellidos */}
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="firstName">Nombres *</Label>
             <Input
               id="firstName"
-              type="text"
               value={formData.firstName}
               onChange={(e) => handleChange("firstName", e.target.value)}
               placeholder="Ingresa tus nombres"
@@ -114,7 +128,6 @@ export function EditProfile() {
             <Label htmlFor="lastName">Apellidos *</Label>
             <Input
               id="lastName"
-              type="text"
               value={formData.lastName}
               onChange={(e) => handleChange("lastName", e.target.value)}
               placeholder="Ingresa tus apellidos"
@@ -123,18 +136,19 @@ export function EditProfile() {
           </div>
         </div>
 
+        {/* edad / correo */}
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="age">Edad *</Label>
             <Input
               id="age"
               type="number"
+              min="13"
+              max="120"
               value={formData.age}
               onChange={(e) => handleChange("age", e.target.value)}
               placeholder="Edad"
               required
-              min="13"
-              max="120"
             />
           </div>
 
@@ -151,6 +165,7 @@ export function EditProfile() {
           </div>
         </div>
 
+        {/* contraseña (solo visual) */}
         <div className="space-y-2">
           <Label htmlFor="password">Contraseña</Label>
           <Input
@@ -161,47 +176,31 @@ export function EditProfile() {
             className="bg-gray-50 cursor-not-allowed"
           />
           <p className="text-xs text-[#1F2937]/60">
-            Para cambiar tu contraseña, usa la sección "Cambiar Contraseña" más abajo
+            Para cambiar tu contraseña, usa la sección "Cambiar Contraseña".
           </p>
         </div>
 
+        {/* botones */}
         <div className="flex gap-3 pt-2">
           <Button
             type="submit"
             disabled={isLoading}
-            tabIndex={0}
-            className="flex-1 bg-[#2563EB] hover:bg-[#1E40AF] text-white 
-             focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
+            className="flex-1 bg-[#2563EB] hover:bg-[#1E40AF] text-white"
           >
             <Save className="w-4 h-4 mr-2" />
             {isLoading ? "Guardando..." : "Guardar Cambios"}
           </Button>
 
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              setFormData({
-                firstName: user?.firstName || "",
-                lastName: user?.lastName || "",
-                age: user?.age?.toString() || "",
-                email: user?.email || "",
-                password: "••••••••"
-              });
-              toast.info("Cambios descartados");
-            }}
-            className="px-6"
-          >
+          <Button variant="outline" type="button" onClick={handleCancel}>
             Cancelar
           </Button>
         </div>
       </form>
 
+      {/* nota */}
       <div className="mt-6 p-4 bg-[#60A5FA]/5 border border-[#60A5FA]/20 rounded-lg">
         <p className="text-sm text-[#1F2937]/70">
           <strong>Nota:</strong> Los campos marcados con * son obligatorios.
-          Asegúrate de que tu correo electrónico sea válido para recibir notificaciones importantes.
         </p>
       </div>
     </div>
