@@ -1,29 +1,17 @@
+// components/videoCall/ControlBar.tsx
 import { Button } from "../ui/button";
-import {
-  Mic,
-  MicOff,
-  Video,
-  VideoOff,
-  MonitorUp,
-  MessageSquare,
-  Users,
-  PhoneOff,
-  Settings,
-  MoreVertical,
-} from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, MessageSquare, Users, PhoneOff } from "lucide-react";
 import { Badge } from "../ui/badge";
 
 interface ControlBarProps {
   isAudioEnabled: boolean;
   isVideoEnabled: boolean;
-  isScreenSharing: boolean;
   showChat: boolean;
   showParticipants: boolean;
   unreadMessages: number;
   participantCount: number;
   onToggleAudio: () => void;
   onToggleVideo: () => void;
-  onToggleScreenShare: () => void;
   onToggleChat: () => void;
   onToggleParticipants: () => void;
   onLeaveCall: () => void;
@@ -32,14 +20,12 @@ interface ControlBarProps {
 export function ControlBar({
   isAudioEnabled,
   isVideoEnabled,
-  isScreenSharing,
   showChat,
   showParticipants,
   unreadMessages,
   participantCount,
   onToggleAudio,
   onToggleVideo,
-  onToggleScreenShare,
   onToggleChat,
   onToggleParticipants,
   onLeaveCall,
@@ -47,22 +33,13 @@ export function ControlBar({
   return (
     <div className="bg-gray-800 border-t border-gray-700 px-6 py-4">
       <div className="flex items-center justify-between max-w-7xl mx-auto w-full">
-
-        {/* ⭐ Botones centrados: mic, video, salir */}
+        {/* Centro: mic, video, salir */}
         <div className="flex justify-center gap-2 flex-1">
-          <Button
-            variant={isAudioEnabled ? "circleBlue" : "circleRed"}
-            size="circle"
-            onClick={onToggleAudio}
-          >
+          <Button variant={isAudioEnabled ? "circleBlue" : "circleRed"} size="circle" onClick={onToggleAudio}>
             {isAudioEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
           </Button>
 
-          <Button
-            variant={isVideoEnabled ? "circleBlue" : "circleRed"}
-            size="circle"
-            onClick={onToggleVideo}
-          >
+          <Button variant={isVideoEnabled ? "circleBlue" : "circleRed"} size="circle" onClick={onToggleVideo}>
             {isVideoEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
           </Button>
 
@@ -72,14 +49,10 @@ export function ControlBar({
           </Button>
         </div>
 
-        {/* 📌 Botones alineados a la derecha */}
+        {/* Derecha: chat y participantes */}
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Button
-              variant={showChat ? "circleBlue" : "secondary"}
-              size="circle"
-              onClick={onToggleChat}
-            >
+            <Button variant={showChat ? "circleBlue" : "secondary"} size="circle" onClick={onToggleChat}>
               <MessageSquare className="w-5 h-5 text-white" />
             </Button>
             {unreadMessages > 0 && !showChat && (
@@ -98,7 +71,7 @@ export function ControlBar({
               size="circle"
               onClick={onToggleParticipants}
             >
-              <Users className="w-5 h-5 bg text-white"/>
+              <Users className="w-5 h-5 text-white" />
             </Button>
             {participantCount > 1 && (
               <Badge
@@ -109,15 +82,6 @@ export function ControlBar({
               </Badge>
             )}
           </div>
-          {/* 
-          <Button variant="circleBlue" size="circle">
-            <Settings className="w-5 h-5" />
-          </Button>
-
-          <Button variant="circleBlue" size="circle">
-            <MoreVertical className="w-5 h-5" />
-          </Button>
-          */}
         </div>
       </div>
     </div>
