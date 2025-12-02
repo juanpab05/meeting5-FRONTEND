@@ -1,4 +1,4 @@
-// components/videoCall/VideoGrid.tsx
+
 import type { Participant } from "../../types";
 import { VideoTile } from "./VideoTile";
 
@@ -16,10 +16,28 @@ export function VideoGrid({ participants }: VideoGridProps) {
     return "grid-cols-3 grid-rows-3";
   };
 
+  const gridClass = getGridClass();
+  const isMultiRow = gridClass.includes("grid-rows-");
+
   return (
-    <div className={`h-full grid gap-4 ${getGridClass()}`}>
+    <div
+      className={`h-full grid gap-4 ${gridClass}`}
+      role="list"
+      aria-label="Grid de videos de participantes"
+      aria-rowcount={isMultiRow ? Number(gridClass.match(/grid-rows-(\d+)/)?.[1]) : undefined}
+      aria-colcount={Number(gridClass.match(/grid-cols-(\d+)/)?.[1])}
+    >
       {participants.map((participant) => (
-        <VideoTile key={participant.id} participant={participant} />
+        <div 
+            key={participant.id} // La key del contenedor es el ID
+            role="listitem" 
+            aria-label={`Video de ${participant.name}`}
+        >
+          <VideoTile 
+            key={participant.stream?.id || `no-stream-${participant.id}`} 
+            participant={participant} 
+          />
+        </div>
       ))}
     </div>
   );

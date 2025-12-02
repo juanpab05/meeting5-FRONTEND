@@ -1,5 +1,5 @@
-// components/videoCall/VideoCallRoom.tsx
-import { useState, useEffect, useMemo } from "react";
+
+import { useState, useEffect, useMemo, useRef } from "react"; // <--- 1. Importa useRef
 import { useParams, useNavigate } from "react-router-dom";
 import { VideoGrid } from "./VideoGrid";
 import { ControlBar } from "./ControlBar";
@@ -12,6 +12,8 @@ import {
   setOnPeerStream,
   setOnPeerConnected,
   setOnPeerDisconnected,
+  setOnPeerNameUpdated,
+  sendUserToSignal,
   disableOutgoingStream,
   enableOutgoingStream,
   disableOutgoingVideo,
@@ -29,22 +31,22 @@ interface ParticipantWithStream extends Participant {
 }
 
 export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
-  const { id } = useParams(); // meetingId desde la URL
+  const { id } = useParams();
   const navigate = useNavigate();
-  const userData = localStorage.getItem("user");
-  if (!userData) {
-    throw new Error("User data not found in localStorage");
-  }
-  const parsedData = JSON.parse(userData);
   const { user } = useUser();
 
-  const selfName =  `${parsedData.firstName} ${parsedData.lastName}`
+
+  const peerNamesRef = useRef<Record<string, string>>({});
+
+  const selfName = useMemo(
+    () => (user ? `${user.firstName} ${user.lastName}` : "Invitado"),
+    [user]
+  );
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [numParticipants, setNumParticipants] = useState(1);
   const [peerStreams, setPeerStreams] = useState<Record<string, MediaStream>>({});
 
-  // Estado de participantes (local + remotos)
   const [participants, setParticipants] = useState<ParticipantWithStream[]>(() => {
     const selfId = user?._id || getSelfSocketId() || "local";
     return [
@@ -65,31 +67,30 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const [showParticipants, setShowParticipants] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
-  // Inicialización de WebRTC y Signaling
+
   useEffect(() => {
-    initWebRTC();
+    let mounted = true;
 
     setOnPeerStream((peerId: string, stream: MediaStream) => {
+      if (!mounted) return;
+      
       setPeerStreams((prev) => ({ ...prev, [peerId]: stream }));
       setParticipants((prev) => {
         const index = prev.findIndex((p) => p.id === peerId);
+        
         if (index !== -1) {
-          // Actualizar el participante existente con el stream
           const updated = [...prev];
-          updated[index] = {
-            ...updated[index],
-            stream,
-            videoEnabled: true,
-            audioEnabled: true,
-          };
+
+          updated[index] = { ...updated[index], stream, videoEnabled: true, audioEnabled: true }; 
           return updated;
         }
-        // Agregar nuevo participante
+        
+        const savedName = peerNamesRef.current[peerId];
         return [
           ...prev,
           {
             id: peerId,
-            name: `Usuario ${peerId.slice(0, 5)}`,
+            name: savedName || `Usuario ${peerId.slice(0, 5)}`,
             isLocal: false,
             audioEnabled: true,
             videoEnabled: true,
@@ -97,15 +98,28 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
           },
         ];
       });
-      
     });
 
-    // Conexión/desconexión de peers (sin stream aún)
+    setOnPeerNameUpdated((peerId: string, name: string) => {
+      peerNamesRef.current[peerId] = name;
+
+      setParticipants(prev =>
+        prev.map(p =>
+          p.id === peerId
+            ? { ...p, name }
+            : p
+        )
+      );
+    });
+    
+
     setOnPeerConnected((peerId: string) => {
       console.log(`[peer ${peerId}] conectado`);
     });
 
     setOnPeerDisconnected((peerId: string) => {
+      delete peerNamesRef.current[peerId];
+      
       setParticipants((prev) => prev.filter((p) => p.id !== peerId));
       setPeerStreams((prev) => {
         const next = { ...prev };
@@ -114,44 +128,55 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       });
     });
 
-    // Conexión al socket de la sala (chat/conteo)
+    if (!localMediaStream) {
+      initWebRTC();
+  } else {
+
+      sendUserToSignal(selfName);
+  }
+
+  sendUserToSignal(selfName);
+
     if (id) {
       getRoomCount(id);
       connectRoomSocket(id);
     }
 
     socket.on("room-count", (roomCount: roomCount) => {
-      setNumParticipants(roomCount.uniqueUserCount + 1); // +1 local user
+      setNumParticipants(roomCount.uniqueUserCount + 1);
     });
+
     socket.on("new-message", (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev, msg]);
+      const liveRegion = document.getElementById("sr-message-updates");
+      if (liveRegion) {
+        liveRegion.textContent = `Nuevo mensaje de ${msg.userName}: ${msg.content}`;
+      }
       if (!showChat) setUnreadMessages((u) => u + 1);
     });
+
     socket.on("error", (errorMessage: { message: string }) => {
-      console.error("Socket error:", errorMessage);
-      if (errorMessage.message === "Access denied to this meeting") {
-        toast.error("Acceso denegado a esta reunión");
-        handleLeave();
-      } else if (errorMessage.message === "User already connected from another session") {
-        toast.error("El usuario ya está conectado a la reunión desde otra página");
-        handleLeave();
-      }
+        console.error("Socket error:", errorMessage);
+        if (errorMessage.message === "Access denied to this meeting") {
+          toast.error("Acceso denegado a esta reunión");
+          handleLeave();
+        } else if (errorMessage.message === "User already connected from another session") {
+          toast.error("El usuario ya está conectado a la reunión desde otra página");
+          handleLeave();
+        }
     });
 
     return () => {
+      mounted = false;
       socket.off("error");
       socket.off("room-count");
       socket.off("new-message");
     };
-  }, [id]);
+  }, [id, selfName]); // Dependencias
 
-  // Toggles de audio/video
+
   const toggleAudio = () => {
-    if (isAudioEnabled) {
-      disableOutgoingStream();
-    } else {
-      enableOutgoingStream();
-    }
+    isAudioEnabled ? disableOutgoingStream() : enableOutgoingStream();
     setIsAudioEnabled(!isAudioEnabled);
     setParticipants((prev) =>
       prev.map((p) => (p.isLocal ? { ...p, audioEnabled: !isAudioEnabled } : p))
@@ -159,11 +184,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   };
 
   const toggleVideo = () => {
-    if (isVideoEnabled) {
-      disableOutgoingVideo();
-    } else {
-      enableOutgoingVideo();
-    }
+    isVideoEnabled ? disableOutgoingVideo() : enableOutgoingVideo();
     setIsVideoEnabled(!isVideoEnabled);
     setParticipants((prev) =>
       prev.map((p) => (p.isLocal ? { ...p, videoEnabled: !isVideoEnabled } : p))
@@ -179,7 +200,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     setShowParticipants(!showParticipants);
   };
 
-  // Salir de la llamada (cleanup)
   const handleLeave = () => {
     try {
       closeAllPeers();
@@ -187,6 +207,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     } catch (e) {
       console.warn("Cleanup error:", e);
     }
+
     if (onLeave) {
       onLeave();
     } else {
@@ -195,7 +216,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     }
   };
 
-  // Inyectar streams reales
   const uniqueParticipants = participants.reduce((acc, curr) => {
     if (!acc.some((p) => p.id === curr.id)) {
       acc.push(curr);
@@ -209,13 +229,14 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   }));
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900">
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
+    <div className="h-screen flex flex-col bg-gray-900" role="main" aria-label="Sala de videollamada">
+      <div id="sr-message-updates" aria-live="polite" className="sr-only"></div>
+
+      <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700" role="banner">
         <div>
           <h1 className="text-white">Sala de Reunión</h1>
           <p className="text-sm text-gray-400">
-            ID: {id} • {numParticipants} {numParticipants === 1 ? "participante" : "participantes"}
+            ID: {id} • <span>{numParticipants} {numParticipants === 1 ? "participante" : "participantes"}</span>
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -233,23 +254,22 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Video Grid */}
         <div className="flex-1 p-4">
           <VideoGrid participants={participantsWithStreams} />
         </div>
-
-        {/* Chat Panel */}
-        {showChat && <ChatPanel messages={chatMessages} onClose={toggleChat} />}
-
-        {/* Participants Panel */}
+        {showChat && (
+          <div role="complementary">
+            <ChatPanel messages={chatMessages} onClose={toggleChat} />
+          </div>
+        )}
         {showParticipants && (
-          <ParticipantsList participants={participants} onClose={toggleParticipants} />
+          <div role="complementary">
+            <ParticipantsList participants={participants} onClose={toggleParticipants} />
+          </div>
         )}
       </div>
 
-      {/* Control Bar */}
       <ControlBar
         isAudioEnabled={isAudioEnabled}
         isVideoEnabled={isVideoEnabled}
