@@ -64,17 +64,15 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
 
   return (
     <div
-      className="flex items-center p-2
-        sm:pl-4
-        md:pl-22 
-        "
+      className="flex items-center p-2 sm:pl-4 md:pl-22"
+      role="navigation"
+      aria-label="Acciones de usuario"
     >
       {!auth && (
         <div
-          className="
-            flex flex-row gap-2
-            sm:flex-row sm:gap-4
-            "
+          className="flex flex-row gap-2 sm:flex-row sm:gap-4"
+          role="group"
+          aria-label="Opciones de autenticación"
         >
           <button
             type="button"
@@ -85,36 +83,36 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
               px-2 py-1 text-sm rounded-md
               sm:px-4 sm:py-2 sm:text-base sm:rounded-lg
               transition-colors cursor-pointer
-              "
-            >
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+            "
+            aria-label="Ir a iniciar sesión"
+          >
             Iniciar sesión
           </button>
 
           <button
-              type="button"
-              onClick={() => navigate("/sign-up")}
-              className="
-                hidden md:block
-                bg-[#362ED9] hover:bg-[#1F198A] font-semibold 
-                px-2 py-1 text-sm rounded-md
-                sm:px-4 sm:py-2 sm:text-base sm:rounded-lg
-                transition-colors cursor-pointer
-                "
-              >
-              Registrarse
+            type="button"
+            onClick={() => navigate("/sign-up")}
+            className="
+              hidden md:block
+              bg-[#362ED9] hover:bg-[#1F198A] font-semibold 
+              px-2 py-1 text-sm rounded-md
+              sm:px-4 sm:py-2 sm:text-base sm:rounded-lg
+              transition-colors cursor-pointer
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+            "
+            aria-label="Ir a registrarse"
+          >
+            Registrarse
           </button>
-
-
         </div>
-      )
-      }
+      )}
 
       {auth && localStorage.getItem("token") && (
         <div
-          className="
-            flex flex-row gap-2
-            sm:flex-row sm:gap-4
-            "
+          className="flex flex-row gap-2 sm:flex-row sm:gap-4"
+          role="group"
+          aria-label="Opciones de usuario autenticado"
         >
           <button
             type="button"
@@ -124,8 +122,12 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
               text-white font-semibold 
               px-4 py-2 rounded-lg transition-colors
               cursor-pointer
-              "
-          > Crear reunión </button>
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600
+            "
+            aria-label="Crear nueva reunión"
+          >
+            Crear reunión
+          </button>
 
           <button
             type="button"
@@ -136,23 +138,28 @@ export const HeaderButtons: React.FC<PropsAuth> = ({ auth, setAuth }) => {
               text-white font-semibold 
               px-4 py-2 rounded-lg transition-colors
               cursor-pointer
-              "
-          > Ver perfil </button>
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600
+            "
+            aria-label="Ver perfil del usuario"
+          >
+            Ver perfil
+          </button>
 
           <button
             type="button"
-            onClick={() => {
-              handleLogout()
-            }}
+            onClick={handleLogout}
             className="
               hidden md:block
               bg-[#362ED9] hover:bg-[#1F198A] font-semibold 
               px-4 py-2 rounded-lg transition-colors cursor-pointer
-              "
-          > Cerrar sesión </button> 
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600
+            "
+            aria-label="Cerrar sesión del usuario"
+          >
+            Cerrar sesión
+          </button>
         </div>
-      )
-      }
+      )}
     </div>
   );
 };

@@ -3,12 +3,6 @@ import Login from "./HeaderButtons";
 import { PropsAuth } from "../schemas/auth";
 import React from "react";
 
-/**
- * Mobile header component.
- *
- * Compact header used on small screens that shows a logo, quick auth
- * buttons and the mobile navigation toggle.
- */
 export const HeaderMobile: React.FC<PropsAuth> = ({ auth, setAuth }) => {
   return (
     <header
@@ -20,27 +14,30 @@ export const HeaderMobile: React.FC<PropsAuth> = ({ auth, setAuth }) => {
         px-4 h-16
       "
       role="banner"
+      aria-label="Encabezado móvil del sitio"
     >
-      {/* === LEFT SIDE: LOGO + TEXT === */}
+      {/* LOGO + NOMBRE */}
       <div className="flex items-center gap-2">
-        {/* ICONO (pon el tuyo aquí) */}
         <div className="w-10 h-10 flex items-center justify-center">
-          <img className="w-auto rounded-lg" src="logo.svg" alt="Logo de meeting5"/>
+          <img
+            className="w-auto rounded-lg"
+            src="logo.svg"
+            alt="Logo de Meeting5"
+            loading="lazy"
+          />
         </div>
 
-        {/* TEXTO DEL LOGO */}
         <span className="text-xl font-semibold tracking-wide">
-          meeting5
+          Meeting5
         </span>
       </div>
 
-      {/* === RIGHT SIDE: BUTTONS === */}
+      {/* BOTONES */}
       <div className="flex items-center gap-3">
-        {/* Botón iniciar sesión */}
         <Login auth={auth} setAuth={setAuth} />
 
-        {/* Menú hamburguesa */}
-        <NavbarMobile isAuth={auth} />
+        {/* Menú hamburguesa accesible */}
+        <NavbarMobile isAuth={auth} aria-label="Abrir menú de navegación" />
       </div>
     </header>
   );

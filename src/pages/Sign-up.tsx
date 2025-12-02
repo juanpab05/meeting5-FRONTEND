@@ -22,19 +22,15 @@ export const SignUP: React.FC = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [ageError, setAgeError] = useState("");
+
   const hasErrors =
-  !!passwordError ||
-  !!confirmPasswordError ||
-  !!emailError ||
-  !!ageError ||
-  Object.values(formulario).some((field) => field === "");
+    !!passwordError ||
+    !!confirmPasswordError ||
+    !!emailError ||
+    !!ageError ||
+    Object.values(formulario).some((field) => field === "");
 
   const navigate = useNavigate();
-
-  /**
-   * Handle changes on input fields and sync them into `formulario`.
-   * @param e - Input change event
-   */
 
   const validatePassword = (password: string) => {
     if (password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
@@ -47,7 +43,7 @@ export const SignUP: React.FC = () => {
   const validatePasswordEquality = (password: string, confirmPassword: string) => {
     if (password !== confirmPassword) return "Las contraseñas no coinciden.";
     return null;
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,9 +51,7 @@ export const SignUP: React.FC = () => {
     setFormulario({ ...formulario, [name]: value });
 
     if (name === "password") {
-      const error = validatePassword(
-        name === "password" ? value : formulario.password
-      );
+      const error = validatePassword(value);
       setPasswordError(error || "");
     }
 
@@ -76,7 +70,6 @@ export const SignUP: React.FC = () => {
         setEmailError("");
       }
     }
-
   };
 
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,13 +82,6 @@ export const SignUP: React.FC = () => {
       setAgeError("");
     }
   };
-
-
-
-  /**
-   * Validate password strength and equality.
-   * Returns an error string when validation fails or `null` when valid.
-   */
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -134,29 +120,20 @@ export const SignUP: React.FC = () => {
         setErrorMessage("Los datos enviados no son válidos.");
       } else if (error.message.includes("Unauthorized")) {
         setErrorMessage("No tienes permiso para realizar esta acción.");
-      }
-      else if (error.message.includes("Email is already registered")) {
+      } else if (error.message.includes("Email is already registered")) {
         setErrorMessage("El correo electrónico ya está registrado.");
-      }
-      else {
+      } else {
         setErrorMessage("No se pudo registrar el usuario.");
       }
     }
   };
 
-  /**
-   * Submit handler for the registration form.
-   * - Converts `age` to number and validates inputs.
-   * - Calls `fetchRegisterUser` and redirects on success.
-   * - Displays friendly error messages based on API responses.
-   */
-
   return (
     <div className="w-full min-h-screen bg-meeting5 flex items-center justify-center p-6">
-      {/*Sign-up card*/}
       <div className="w-full md:w-full lg:w-1/2 xl:w-1/3 flex flex-col max-w-md md:max-w-lg lg:max-w-2xl bg-white rounded-xl shadow-xl overflow-hidden">
-        {/* Card Content */}
+
         <div className="w-full items-center justify-center p-8 md:p-12 lg:px-16 lg:py-12">
+
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <button
@@ -164,13 +141,17 @@ export const SignUP: React.FC = () => {
               aria-label="Ir a la página de inicio"
               className="cursor-pointer"
             >
-              <img src="logo.svg" className="w-28 rounded-xl" alt="Logo de meeting5" />
+              <img
+                src="logo.svg"
+                className="w-28 rounded-xl"
+                alt="Logo de Meeting5, aplicación de videollamadas"
+              />
             </button>
           </div>
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-black text-3xl lg:text-4xl font-bold text-shadow-lg">Crear una cuenta</h1>
+            <h1 className="text-black text-3xl lg:text-4xl font-bold">Crear una cuenta</h1>
           </div>
 
           {/* Registration form */}
@@ -181,83 +162,131 @@ export const SignUP: React.FC = () => {
           >
             <div className="flex flex-col gap-6">
               <div className="flex flex-col w-full gap-2">
-                <label htmlFor="firstName" className="sr-only">Nombres</label>
+
+                {/* First Name */}
+                <label htmlFor="firstName" className="font-semibold text-sm text-black">
+                  Nombres
+                </label>
                 <input
                   type="text"
                   id="firstName"
                   name="firstName"
                   value={formulario.firstName}
-                  placeholder="Nombres"
+                  placeholder="Ingresa tus nombres"
                   required
-                  className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  aria-invalid={formulario.firstName === "" ? "true" : "false"}
+                  className="rounded-lg h-10 border border-gray-400 p-2 text-sm text-black"
                   onChange={handleChange}
                 />
 
-                <label htmlFor="lastName" className="sr-only">Apellidos</label>
+                {/* Last Name */}
+                <label htmlFor="lastName" className="font-semibold text-sm text-black">
+                  Apellidos
+                </label>
                 <input
                   type="text"
                   id="lastName"
                   name="lastName"
                   value={formulario.lastName}
-                  placeholder="Apellidos"
+                  placeholder="Ingresa tus apellidos"
                   required
-                  className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  aria-invalid={formulario.lastName === "" ? "true" : "false"}
+                  className="rounded-lg h-10 border border-gray-400 p-2 text-sm text-black"
                   onChange={handleChange}
                 />
-                <label htmlFor="age" className="sr-only">Edad</label>
+
+                {/* Age */}
+                <label htmlFor="age" className="font-semibold text-sm text-black">
+                  Edad
+                </label>
                 <input
                   type="text"
                   id="age"
                   name="age"
                   value={age}
-                  placeholder="Edad"
+                  placeholder="Ingresa tu edad"
                   required
-                  className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  aria-invalid={!!ageError}
+                  aria-describedby={ageError ? "age-error" : undefined}
+                  className="rounded-lg h-10 border border-gray-400 p-2 text-sm text-black"
                   onChange={handleAgeChange}
                 />
-                {ageError && <p className="text-red-500 text-xs mb-3">{ageError}</p>}
+                {ageError && (
+                  <p id="age-error" className="text-red-500 text-xs" role="alert">
+                    {ageError}
+                  </p>
+                )}
 
-                <label htmlFor="email" className="sr-only">Correo electrónico</label>
+                {/* Email */}
+                <label htmlFor="email" className="font-semibold text-sm text-black">
+                  Correo electrónico
+                </label>
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formulario.email}
-                  placeholder="Correo electrónico"
+                  placeholder="Ejemplo: usuario@gmail.com"
                   required
-                  className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "email-error" : undefined}
+                  className="rounded-lg h-10 border border-gray-400 p-2 text-sm text-black"
                   onChange={handleChange}
                 />
-                {emailError && <p className="text-red-500 text-xs mb-3">{emailError}</p>}
+                {emailError && (
+                  <p id="email-error" className="text-red-500 text-xs" role="alert">
+                    {emailError}
+                  </p>
+                )}
 
-                <label htmlFor="password" className="sr-only">Contraseña</label>
+                {/* Password */}
+                <label htmlFor="password" className="font-semibold text-sm text-black">
+                  Contraseña
+                </label>
                 <input
                   type="password"
                   id="password"
                   name="password"
                   value={formulario.password}
-                  placeholder="Contraseña"
+                  placeholder="Mínimo 8 caracteres, mayúscula, número y símbolo"
                   required
-                  className="mb-3 rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  aria-invalid={!!passwordError}
+                  aria-describedby={passwordError ? "password-error" : undefined}
+                  className="rounded-lg h-10 border border-gray-400 p-2 text-sm text-black"
                   onChange={handleChange}
                 />
                 {passwordError && (
-                  <p className="text-red-500 text-xs mb-3">{passwordError}</p>
+                  <p id="password-error" className="text-red-500 text-xs" role="alert">
+                    {passwordError}
+                  </p>
                 )}
 
-                <label htmlFor="confirmPassword" className="sr-only">Confirmar contraseña</label>
+                {/* Confirm Password */}
+                <label htmlFor="confirmPassword" className="font-semibold text-sm text-black">
+                  Confirmar contraseña
+                </label>
                 <input
                   type="password"
                   id="confirmPassword"
                   name="confirmPassword"
                   value={formulario.confirmPassword}
-                  placeholder="Confirmar contraseña"
+                  placeholder="Vuelve a ingresar la contraseña"
                   required
-                  className="mb-3 bg-white rounded-lg h-10 border border-gray-400 p-2 text-sm text-black placeholder-gray-500 w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-required="true"
+                  aria-invalid={!!confirmPasswordError}
+                  aria-describedby={confirmPasswordError ? "confirmPassword-error" : undefined}
+                  className="rounded-lg h-10 border border-gray-400 p-2 text-sm text-black"
                   onChange={handleChange}
                 />
                 {confirmPasswordError && (
-                  <p className="text-red-500 text-xs mb-3">{confirmPasswordError}</p>
+                  <p id="confirmPassword-error" className="text-red-500 text-xs" role="alert">
+                    {confirmPasswordError}
+                  </p>
                 )}
               </div>
             </div>
@@ -266,7 +295,7 @@ export const SignUP: React.FC = () => {
               <button
                 type="submit"
                 disabled={hasErrors}
-                className="w-full bg-[#1D4ED8] hover:bg-[#1943B8] text-xl text-white font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full bg-blue-700 hover:bg-blue-800 text-xl text-white font-semibold py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Registrarse
               </button>
@@ -279,10 +308,10 @@ export const SignUP: React.FC = () => {
             </p>
           )}
 
-          <div className="flex flex-wrap justify-center gap-2 mt-6 mb-10 text-sm text-gray-500">
+          <div className="flex flex-wrap justify-center gap-2 mt-6 mb-10 text-sm text-gray-600">
             <button
               onClick={() => navigate("/sign-in")}
-              className="text-gray-500 hover:text-blue-500 text-sm transition-colors disabled:opacity-50"
+              className="hover:text-blue-500 transition-colors"
             >
               ¿Ya tienes una cuenta? Inicia sesión
             </button>

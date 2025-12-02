@@ -22,8 +22,15 @@ export function DeleteAccount() {
   const [showDialog, setShowDialog] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+
   const navigate = useNavigate();
   const { setUser, guestUser } = useUser();
+
+  const clearSession = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(guestUser);
+  };
 
   const handleDelete = async () => {
     if (confirmText !== "ELIMINAR") {
@@ -32,22 +39,24 @@ export function DeleteAccount() {
     }
 
     setIsDeleting(true);
+
     try {
       const response = await fetchDeleteUser();
 
-      if (response.success) {
-        toast.success("Cuenta eliminada exitosamente ✅");
-
-        // 👇 limpiar todo
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setUser(guestUser);
-
-        setShowDialog(false);
-        setConfirmText("");
-
-        navigate("/sign-in"); // o homepage
+      if (!response.success) {
+        toast.error("Hubo un error al eliminar la cuenta");
+        return;
       }
+
+      toast.success("Cuenta eliminada exitosamente ✅");
+
+      clearSession();
+
+      setShowDialog(false);
+      setConfirmText("");
+
+      navigate("/sign-in");
+
     } catch (error) {
       console.error(error);
       toast.error("Error al eliminar la cuenta");
@@ -56,21 +65,25 @@ export function DeleteAccount() {
     }
   };
 
-
   return (
     <>
+      {/* Card principal */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#EF4444]/20">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-lg bg-[#EF4444]/10 flex items-center justify-center">
             <AlertTriangle className="w-5 h-5 text-[#EF4444]" />
           </div>
+
           <div>
             <h2 className="text-[#1F2937]">Zona de Peligro</h2>
-            <p className="text-sm text-[#1F2937]/60">Eliminar cuenta permanentemente</p>
+            <p className="text-sm text-[#1F2937]/60">
+              Eliminar cuenta permanentemente
+            </p>
           </div>
         </div>
 
         <div className="space-y-4">
+          {/* Advertencia */}
           <div className="bg-[#FEF2F2] border border-[#EF4444]/20 rounded-lg p-4">
             <h3 className="text-[#EF4444] mb-2 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4" />
@@ -87,8 +100,7 @@ export function DeleteAccount() {
           <Button
             variant="destructive"
             onClick={() => setShowDialog(true)}
-            className="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white
-             focus:outline-none focus:ring-2 focus:ring-[#EF4444] focus:ring-offset-2"
+            className="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white"
           >
             <Trash2 className="w-4 h-4 mr-2" />
             Eliminar mi Cuenta
@@ -96,6 +108,7 @@ export function DeleteAccount() {
         </div>
       </div>
 
+      {/* Dialogo */}
       <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -103,12 +116,14 @@ export function DeleteAccount() {
               <AlertTriangle className="w-5 h-5" />
               ¿Estás completamente seguro?
             </AlertDialogTitle>
+
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminará permanentemente tu cuenta
-              y removerá todos tus datos de nuestros servidores.
+              Esta acción eliminará permanentemente tu cuenta y todos tus datos.
+              No podrás recuperarlos después.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
+          {/* Confirmación de texto */}
           <div className="space-y-2 my-4">
             <Label htmlFor="confirm-delete">
               Escribe <strong>ELIMINAR</strong> para confirmar:
@@ -124,17 +139,15 @@ export function DeleteAccount() {
 
           <AlertDialogFooter>
             <AlertDialogCancel
-              onClick={() => {
-                setConfirmText("");
-              }}
+              onClick={() => setConfirmText("")}
             >
               Cancelar
             </AlertDialogCancel>
+
             <AlertDialogAction
               onClick={handleDelete}
-              disabled={confirmText !== "ELIMINAR" || isDeleting}
-              className="bg-[#EF4444] hover:bg-[#DC2626] text-white
-             focus:outline-none focus:ring-2 focus:ring-[#EF4444] focus:ring-offset-2"
+              disabled={isDeleting || confirmText !== "ELIMINAR"}
+              className="bg-[#EF4444] hover:bg-[#DC2626] text-white"
             >
               {isDeleting ? "Eliminando..." : "Sí, eliminar mi cuenta"}
             </AlertDialogAction>

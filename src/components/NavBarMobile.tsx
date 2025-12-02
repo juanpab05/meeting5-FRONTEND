@@ -12,7 +12,6 @@ import { useNavigate } from "react-router";
  * - `isAuth` (optional): whether the user is authenticated; controls which
  *    navigation items (login/burger-menu vs create-meet/burger-menu) are shown.
  */
-
 export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
   const fila =
     "border-b border-white/20 flex w-full justify-center items-center py-6";
@@ -25,21 +24,18 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
   };
 
   const { setUser, guestUser } = useUser();
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const goToAnchor = (id: string) => {
-  setIsOpen(false);
-  navigate("/"); // primero llévalo a la landing
+  const goToAnchor = (id: string) => {
+    setIsOpen(false);
+    navigate("/");
 
-  setTimeout(() => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  }, 50);
-};
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+  };
 
-  /**
-   * Clears authentication artifacts and resets context to guest user.
-   */
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -62,15 +58,23 @@ const goToAnchor = (id: string) => {
 
   return (
     <div className="flex items-center">
-      {/* Ícono hamburguesa */}
-      <ListIcon
+      {/* Botón accesible de menú hamburguesa */}
+      <button
         onClick={handleMenu}
-        className="text-white w-7 h-7 active:scale-95 transition"
-      />
+        aria-label="Abrir menú de navegación"
+        aria-expanded={isOpen}
+        aria-controls="mobile-navigation"
+        className="text-white w-8 h-8 flex items-center justify-center active:scale-95 transition"
+      >
+        <ListIcon aria-hidden="true" className="w-7 h-7" />
+      </button>
 
       {/* PANEL LATERAL */}
       <div
+        id="mobile-navigation"
         ref={menuRef}
+        role="navigation"
+        aria-label="Menú de navegación móvil"
         className={`
           fixed top-0 right-0 h-full w-[70%] 
           bg-[#2E92D9] text-white shadow-xl 
@@ -79,6 +83,9 @@ const goToAnchor = (id: string) => {
           ${isOpen ? "translate-x-0" : "translate-x-full"}
         `}
       >
+        {/* Título accesible solo para lectores de pantalla */}
+        <h2 className="sr-only">Navegación principal</h2>
+
         <nav className="w-full">
           <div className={fila}>
             <Link to="/" onClick={() => setIsOpen(false)}>
@@ -86,20 +93,21 @@ const goToAnchor = (id: string) => {
             </Link>
           </div>
 
-        {!isAuth && !getToken() && (
-          <>
-          <div className={fila}>
-            <Link to="/sign-in" onClick={() => setIsOpen(false)}>
-              <span className={hover}>Iniciar sesión</span>
-            </Link>
-          </div>
+          {!isAuth && !getToken() && (
+            <>
+              <div className={fila}>
+                <Link to="/sign-in" onClick={() => setIsOpen(false)}>
+                  <span className={hover}>Iniciar sesión</span>
+                </Link>
+              </div>
 
-          <div className={fila}>
-            <Link to="/sign-up" onClick={() => setIsOpen(false)}>
-              <span className={hover}>Registrarse</span>
-            </Link>
-          </div>
-        </>)}
+              <div className={fila}>
+                <Link to="/sign-up" onClick={() => setIsOpen(false)}>
+                  <span className={hover}>Registrarse</span>
+                </Link>
+              </div>
+            </>
+          )}
 
           {isAuth && getToken() && (
             <>
@@ -108,28 +116,26 @@ const goToAnchor = (id: string) => {
                   <span className={hover}>Ver perfil</span>
                 </Link>
               </div>
+
               <div className={fila}>
-                <Link to="/" onClick={() => setIsOpen(false)}>
                 <button onClick={handleLogout} className={hover}>
                   Cerrar sesión
                 </button>
-                </Link>
               </div>
             </>
           )}
+
           <div className={fila}>
             <button onClick={() => goToAnchor("about-us")} className={hover}>
               Sobre nosotros
             </button>
           </div>
 
-
           <div className={fila}>
             <button onClick={() => goToAnchor("sitemap")} className={hover}>
               Mapa del sitio
             </button>
           </div>
-
         </nav>
       </div>
     </div>
