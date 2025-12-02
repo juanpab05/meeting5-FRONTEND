@@ -1,4 +1,3 @@
-// components/videoCall/VideoTile.tsx
 import { useEffect, useRef } from "react";
 import type { Participant } from "../../types";
 import { Mic, MicOff, VideoOff } from "lucide-react";

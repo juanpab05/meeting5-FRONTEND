@@ -14,9 +14,33 @@ type PeerEntry = {
 let socket: ReturnType<typeof io> | null = null;
 let peers: Record<string, PeerEntry> = {};
 
-export let localMediaStream: MediaStream | null = null;
 
-// Callbacks que registra React
+
+function getNameFromLocalStorage(): string | null {
+  try {
+     const userData = localStorage.getItem("user");
+     const parsedData = userData ? JSON.parse(userData) : null;
+     return parsedData ? `${parsedData.firstName} ${parsedData.lastName}` : null;
+  } catch {
+     return null;
+  }
+}
+
+// 1. Agrega esta función exportada para poder llamarla desde React
+export function sendUserToSignal(name: string) {
+  if (socket && socket.connected) {
+    socket.emit("setName", name);
+    console.log("[Signal] Name sent manually:", name);
+  } else {
+    // Si el socket aún no conecta, guardamos el nombre temporalmente
+    // para enviarlo apenas conecte (ver modificación en initSocketConnection)
+    tempName = name; 
+  }
+}
+
+export let localMediaStream: MediaStream | null = null;
+let isInitializing = false;
+let tempName: string | null = null;
 let onPeerStream: ((peerId: string, stream: MediaStream) => void) | null = null;
 let onPeerConnected: ((peerId: string) => void) | null = null;
 let onPeerDisconnected: ((peerId: string) => void) | null = null;
@@ -41,19 +65,36 @@ export function getSelfSocketId(): string | null {
  * Inicializa WebRTC: captura media local y conecta al servidor de señalización.
  */
 export async function initWebRTC() {
-  if (!Peer.WEBRTC_SUPPORT) {
-    console.warn("WebRTC is not supported in this browser.");
+  // 1. Prevención de doble ejecución
+  if (isInitializing || (socket && socket.connected)) {
+    console.log("[WebRTC] Ya inicializado o conectando...");
     return;
   }
+  
+  isInitializing = true; // Bloqueamos nuevas llamadas
+
+  if (!Peer.WEBRTC_SUPPORT) {
+    console.warn("WebRTC is not supported in this browser.");
+    isInitializing = false;
+    return;
+  }
+
   try {
-    localMediaStream = await getMedia();
+    // Si ya tenemos stream local (por una navegación anterior SPA), no lo pedimos de nuevo
+    if (!localMediaStream) {
+      localMediaStream = await getMedia();
+    }
+
     console.log("[WebRTC] local tracks:", {
       audio: localMediaStream.getAudioTracks().length,
       video: localMediaStream.getVideoTracks().length,
     });
+    
     initSocketConnection();
   } catch (error) {
     console.error("[WebRTC] Failed to initialize:", error);
+  } finally {
+    isInitializing = false; // Liberamos el bloqueo al terminar (éxito o error)
   }
 }
 
@@ -69,51 +110,66 @@ async function getMedia(): Promise<MediaStream> {
   }
 }
 
-/**
- * Conecta al servidor de señalización y registra listeners.
- */
+// ... imports y configuración igual
+
+let onPeerNameUpdated: ((peerId: string, name: string) => void) | null = null;
+export function setOnPeerNameUpdated(cb: (peerId: string, name: string) => void) {
+  onPeerNameUpdated = cb;
+}
+
 function initSocketConnection() {
+  if (socket) return; 
   socket = io(serverWebRTCUrl);
+  let hasSentName = false;
 
   socket.on("connect", () => {
     console.log("[Signal] connected with id:", socket?.id);
+  
+    if (!hasSentName) {
+      // PRIORIDAD: Si React ya nos pasó un nombre, usamos ese.
+      // Si no, intentamos localStorage como fallback.
+      const nameToSend = tempName || getNameFromLocalStorage();
+      
+      if (nameToSend) {
+        socket?.emit("setName", nameToSend);
+        hasSentName = true;
+      }
+    }
   });
 
   socket.on("introduction", handleIntroduction);
   socket.on("newUserConnected", handleNewUserConnected);
+  socket.on("userNameUpdated", handleUserNameUpdated);
   socket.on("userDisconnected", handleUserDisconnected);
   socket.on("signal", handleSignal);
 }
 
-/**
- * Al conectar, el servidor envía la lista de IDs actuales.
- * Creamos peers como initiator hacia cada uno (excepto nosotros).
- */
-function handleIntroduction(otherClientIds: string[]) {
-  otherClientIds.forEach((theirId) => {
-    if (!socket) return;
-    if (theirId === socket.id) return;
+function handleIntroduction(peersInfo: [string, { name: string | null }][]) {
+  peersInfo.forEach(([theirId, info]) => {
+    if (!socket || theirId === socket.id) return;
     if (peers[theirId]?.peerConnection && !peers[theirId].peerConnection.destroyed) return;
 
     const peerConnection = createPeerConnection(theirId, true);
     peers[theirId] = { peerConnection };
     onPeerConnected?.(theirId);
+
+    onPeerNameUpdated?.(theirId, info.name ?? `Usuario ${theirId.slice(0, 5)}`);
   });
 }
 
-/**
- * Cuando llega un nuevo usuario, preparamos el registro para él.
- * No iniciamos la conexión hasta que recibimos su señal o decidimos iniciar.
- */
-function handleNewUserConnected(theirId: string) {
-  if (!socket) return;
-  if (theirId === socket.id) return;
-  if (peers[theirId]?.peerConnection && !peers[theirId].peerConnection.destroyed) return;
+function handleNewUserConnected({ id, name }: { id: string; name: string | null }) {
+  if (!socket || id === socket.id) return;
+  if (peers[id]?.peerConnection && !peers[id].peerConnection.destroyed) return;
 
-  // Creamos la conexión como NO initiator, esperaremos su señal o emitiremos al recibir señal
-  const peerConnection = createPeerConnection(theirId, false);
-  peers[theirId] = { peerConnection };
-  onPeerConnected?.(theirId);
+  const peerConnection = createPeerConnection(id, false);
+  peers[id] = { peerConnection };
+  onPeerConnected?.(id);
+
+  onPeerNameUpdated?.(id, name ?? `Usuario ${id.slice(0, 5)}`);
+}
+
+function handleUserNameUpdated({ id, name }: { id: string; name: string }) {
+  onPeerNameUpdated?.(id, name);
 }
 
 /**
@@ -134,21 +190,22 @@ function handleUserDisconnected(peerId: string) {
 /**
  * Relé de señal del servidor. Aplicamos al peer correspondiente.
  */
+// webrtc/webrtc.ts (pequeña mejora en handleSignal)
 function handleSignal(to: string, from: string, data: Peer.SignalData) {
-  if (!socket) return;
-  if (to !== socket.id) return;
+  if (!socket || to !== socket.id) return;
 
   let entry = peers[from];
-  if (entry && entry.peerConnection && !entry.peerConnection.destroyed) {
-    entry.peerConnection.signal(data);
-  } else {
-    // Si no existía, creamos como non-initiator y aplicamos la señal recibida.
+  if (!entry || !entry.peerConnection || entry.peerConnection.destroyed) {
+    // Crear sólo si realmente no existe
     const peerConnection = createPeerConnection(from, false);
     peers[from] = { peerConnection };
     onPeerConnected?.(from);
-    peerConnection.signal(data);
   }
+
+  // Aplicar señal sobre el peer existente
+  peers[from].peerConnection.signal(data);
 }
+
 
 /**
  * Crea un peer connection con configuración de ICE servers.

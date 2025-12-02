@@ -1,4 +1,4 @@
-// components/videoCall/ParticipantsList.tsx
+
 import type { Participant } from "../../types";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
