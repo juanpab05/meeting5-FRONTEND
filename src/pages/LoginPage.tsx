@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router"
 import { useUser } from "../context/UserContext"
-import { fetchGoogleLogin, fetchLoginUser } from "../api/login"
+import { fetchSocialLogin, fetchLoginUser } from "../api/login"
 import useAuthStore, { clearAuthUser } from "../stores/useAuthStore";
 import { toast } from "sonner"
 
@@ -72,6 +72,22 @@ export const LoginPage = () => {
     e.preventDefault();
     try {
       await loginWithFacebook();
+      const user = useAuthStore.getState().user;
+      if (user) {
+        const data = await fetchSocialLogin(user.displayName || "", user.email || "", 'facebook');
+        if (data.data.token) {
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
+          refreshUser();
+
+          if (data.message === 'User registered successfully') {
+            toast.success("Cuenta creada")
+          } else {
+            toast.success("Bienvenido de nuevo! " + data.data.user.firstName)
+          }
+          navigate("/create-meet");
+        }
+      }
     } catch (error: any) {
       console.error("Facebook login error:", error);
       setErrorMessage("Ocurrió un problema con Facebook. Intenta nuevamente.");
@@ -84,7 +100,7 @@ export const LoginPage = () => {
       await loginWithGoogle();
       const user = useAuthStore.getState().user;
       if (user) {
-        const data = await fetchGoogleLogin(user.displayName || "", user.email || "");
+        const data = await fetchSocialLogin(user.displayName || "", user.email || "", 'google');
         if (data.data.token) {
           localStorage.setItem('token', data.data.token);
           localStorage.setItem('user', JSON.stringify(data.data.user));
