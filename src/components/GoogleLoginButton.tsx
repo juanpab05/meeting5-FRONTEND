@@ -1,5 +1,3 @@
-// src/components/GoogleLoginButton.tsx
-import React from "react";
 
 const GoogleLoginButton = ({ isLoading }: { isLoading: boolean }) => {
   const handleGoogleLogin = () => {
