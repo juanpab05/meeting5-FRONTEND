@@ -43,28 +43,34 @@ export async function fetchLoginUser(email: string, password: string): Promise<a
   }
 }
 
-export async function fetchGoogleLogin(userName: string, email: string): Promise<any> {
+export async function fetchSocialLogin(userName: string, email: string, provider: string): Promise<any> {
+  let provider_url = "";
+  if (provider == "google"){
+    provider_url = "google-login";
+  } else if (provider == "facebook") {
+    provider_url = "facebook-login";
+  }
   try {
-    const response = await fetch(`${API}/users/google-login`, {
+    const response = await fetch(`${API}/users/${provider_url}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userName, email }),
+      body: JSON.stringify({ userName, email, provider }),
     });
     const data = await response.json();
 
     if (!response.ok) {
-      await handleApiError({response, location: "fetchGoogleLogin"});
+      await handleApiError({response, location: "fetchSocialLogin"});
     }
     if (location) {
-      console.log("[fetchGoogleLogin] User logged in successfully:", data);
+      console.log("[fetchSocialLogin] User logged in successfully:", data);
     }
     return data;
   }
   catch (error) {
     if (location) {
-      console.error("[fetchGoogleLogin] Unexpected error:", error);
+      console.error("[fetchSocialLogin] Unexpected error:", error);
     }
   }
 }
