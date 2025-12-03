@@ -232,15 +232,44 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     <div className="h-screen flex flex-col bg-gray-900" role="main" aria-label="Sala de videollamada">
       <div id="sr-message-updates" aria-live="polite" className="sr-only"></div>
 
-      <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700" role="banner">
-        <div>
+      {/* Región ARIA para mensajes nuevos */}
+      <div
+        id="sr-message-updates"
+        aria-live="polite"
+        className="sr-only"
+      ></div>
+
+      {/* Header */}
+      <div
+        className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700"
+        role="banner"
+      >
+      <div>
           <h1 className="text-white">Sala de Reunión</h1>
-          <p className="text-sm text-gray-400">
-            ID: {id} • <span>{numParticipants} {numParticipants === 1 ? "participante" : "participantes"}</span>
+
+      {/* ID copiable */}
+      <p
+        className="text-sm text-gray-300 cursor-pointer hover:text-white transition"
+        aria-label={`ID de reunión: ${id}`}
+        onClick={() => {
+        navigator.clipboard.writeText(id || "");
+        toast.success("ID copiado al portapapeles");
+        }}
+          title="Haz clic para copiar el ID"
+        >
+          ID: {id}
+      </p>
+      <p
+        className="text-xs text-gray-400 mt-1"
+        aria-label={`Hay ${numParticipants} participantes`}
+      >
+        {numParticipants} {numParticipants === 1 ? "participante" : "participantes"}
           </p>
-        </div>
+      </div>
+
+
         <div className="flex items-center gap-3">
-          <button
+          {/* <button
             onClick={() => {
               navigator.clipboard.writeText(id || "");
               toast.success("ID copiado al portapapeles");
@@ -248,7 +277,8 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
             className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition"
           >
             Copiar ID
-          </button>
+          </button> */}
+
           <span className="text-sm text-gray-400">Reunión en curso</span>
           <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
         </div>
