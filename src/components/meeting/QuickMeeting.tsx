@@ -93,7 +93,7 @@ export function QuickMeeting() {
           type="text"
           placeholder="Escribe una descripción para la reunión"
           onChange={(e) => setDescription(e.target.value)}
-          className="bg-white border-gray-300 text-[#1F2937] py-12"
+          className="bg-white border-gray-300 text-[#1F2937]"
           aria-describedby="description-help"
         />
         <p id="description-help" className="text-sm text-gray-600">
