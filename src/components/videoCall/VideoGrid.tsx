@@ -1,4 +1,4 @@
-// components/videoCall/VideoGrid.tsx
+
 import type { Participant } from "../../types";
 import { VideoTile } from "./VideoTile";
 
@@ -28,8 +28,15 @@ export function VideoGrid({ participants }: VideoGridProps) {
       aria-colcount={Number(gridClass.match(/grid-cols-(\d+)/)?.[1])}
     >
       {participants.map((participant) => (
-        <div key={participant.id} role="listitem" aria-label={`Video de ${participant.name}`}>
-          <VideoTile participant={participant} />
+        <div 
+            key={participant.id} // La key del contenedor es el ID
+            role="listitem" 
+            aria-label={`Video de ${participant.name}`}
+        >
+          <VideoTile 
+            key={participant.stream?.id || `no-stream-${participant.id}`} 
+            participant={participant} 
+          />
         </div>
       ))}
     </div>

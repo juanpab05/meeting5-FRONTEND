@@ -1,4 +1,3 @@
-// components/videoCall/ControlBar.tsx
 import { Button } from "../ui/button";
 import { Mic, MicOff, Video, VideoOff, MessageSquare, Users, PhoneOff } from "lucide-react";
 import { Badge } from "../ui/badge";

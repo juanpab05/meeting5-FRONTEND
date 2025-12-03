@@ -1,5 +1,5 @@
-// components/videoCall/VideoCallRoom.tsx
-import { useState, useEffect, useMemo } from "react";
+
+import { useState, useEffect, useMemo, useRef } from "react"; // <--- 1. Importa useRef
 import { useParams, useNavigate } from "react-router-dom";
 import { VideoGrid } from "./VideoGrid";
 import { ControlBar } from "./ControlBar";
@@ -12,6 +12,8 @@ import {
   setOnPeerStream,
   setOnPeerConnected,
   setOnPeerDisconnected,
+  setOnPeerNameUpdated,
+  sendUserToSignal,
   disableOutgoingStream,
   enableOutgoingStream,
   disableOutgoingVideo,
@@ -32,6 +34,9 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useUser();
+
+
+  const peerNamesRef = useRef<Record<string, string>>({});
 
   const selfName = useMemo(
     () => (user ? `${user.firstName} ${user.lastName}` : "Invitado"),
@@ -62,30 +67,30 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const [showParticipants, setShowParticipants] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
-  // WebRTC + Sockets
+
   useEffect(() => {
-    initWebRTC();
+    let mounted = true;
 
     setOnPeerStream((peerId: string, stream: MediaStream) => {
+      if (!mounted) return;
+      
       setPeerStreams((prev) => ({ ...prev, [peerId]: stream }));
       setParticipants((prev) => {
         const index = prev.findIndex((p) => p.id === peerId);
+        
         if (index !== -1) {
           const updated = [...prev];
-          updated[index] = {
-            ...updated[index],
-            stream,
-            videoEnabled: true,
-            audioEnabled: true,
-          };
+
+          updated[index] = { ...updated[index], stream, videoEnabled: true, audioEnabled: true }; 
           return updated;
         }
-
+        
+        const savedName = peerNamesRef.current[peerId];
         return [
           ...prev,
           {
             id: peerId,
-            name: `Usuario ${peerId.slice(0, 5)}`,
+            name: savedName || `Usuario ${peerId.slice(0, 5)}`,
             isLocal: false,
             audioEnabled: true,
             videoEnabled: true,
@@ -95,11 +100,26 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       });
     });
 
+    setOnPeerNameUpdated((peerId: string, name: string) => {
+      peerNamesRef.current[peerId] = name;
+
+      setParticipants(prev =>
+        prev.map(p =>
+          p.id === peerId
+            ? { ...p, name }
+            : p
+        )
+      );
+    });
+    
+
     setOnPeerConnected((peerId: string) => {
       console.log(`[peer ${peerId}] conectado`);
     });
 
     setOnPeerDisconnected((peerId: string) => {
+      delete peerNamesRef.current[peerId];
+      
       setParticipants((prev) => prev.filter((p) => p.id !== peerId));
       setPeerStreams((prev) => {
         const next = { ...prev };
@@ -107,6 +127,15 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         return next;
       });
     });
+
+    if (!localMediaStream) {
+      initWebRTC();
+  } else {
+
+      sendUserToSignal(selfName);
+  }
+
+  sendUserToSignal(selfName);
 
     if (id) {
       getRoomCount(id);
@@ -119,33 +148,32 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
 
     socket.on("new-message", (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev, msg]);
-
-      // ARIA Live region for screen readers
       const liveRegion = document.getElementById("sr-message-updates");
       if (liveRegion) {
         liveRegion.textContent = `Nuevo mensaje de ${msg.userName}: ${msg.content}`;
       }
-
       if (!showChat) setUnreadMessages((u) => u + 1);
     });
 
     socket.on("error", (errorMessage: { message: string }) => {
-      console.error("Socket error:", errorMessage);
-      if (errorMessage.message === "Access denied to this meeting") {
-        toast.error("Acceso denegado a esta reunión");
-        handleLeave();
-      } else if (errorMessage.message === "User already connected from another session") {
-        toast.error("El usuario ya está conectado a la reunión desde otra página");
-        handleLeave();
-      }
+        console.error("Socket error:", errorMessage);
+        if (errorMessage.message === "Access denied to this meeting") {
+          toast.error("Acceso denegado a esta reunión");
+          handleLeave();
+        } else if (errorMessage.message === "User already connected from another session") {
+          toast.error("El usuario ya está conectado a la reunión desde otra página");
+          handleLeave();
+        }
     });
 
     return () => {
+      mounted = false;
       socket.off("error");
       socket.off("room-count");
       socket.off("new-message");
     };
-  }, [id]);
+  }, [id, selfName]); // Dependencias
+
 
   const toggleAudio = () => {
     isAudioEnabled ? disableOutgoingStream() : enableOutgoingStream();
@@ -202,6 +230,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
 
   return (
     <div className="h-screen flex flex-col bg-gray-900" role="main" aria-label="Sala de videollamada">
+      <div id="sr-message-updates" aria-live="polite" className="sr-only"></div>
 
       {/* Región ARIA para mensajes nuevos */}
       <div
@@ -245,38 +274,27 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
               navigator.clipboard.writeText(id || "");
               toast.success("ID copiado al portapapeles");
             }}
-            aria-label="Copiar ID de la reunión al portapapeles"
             className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition"
           >
             Copiar ID
           </button> */}
 
           <span className="text-sm text-gray-400">Reunión en curso</span>
-
-          {/* Indicador accesible */}
-          <div
-            className="w-2 h-2 bg-red-500 rounded-full animate-pulse"
-            aria-hidden="true"
-          ></div>
-          <span className="sr-only">La reunión está activa</span>
+          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-
-        <div className="flex-1 p-4" aria-label="Rejilla de video">
+        <div className="flex-1 p-4">
           <VideoGrid participants={participantsWithStreams} />
         </div>
-
         {showChat && (
-          <div role="complementary" aria-label="Panel de chat">
+          <div role="complementary">
             <ChatPanel messages={chatMessages} onClose={toggleChat} />
           </div>
         )}
-
         {showParticipants && (
-          <div role="complementary" aria-label="Lista de participantes">
+          <div role="complementary">
             <ParticipantsList participants={participants} onClose={toggleParticipants} />
           </div>
         )}
