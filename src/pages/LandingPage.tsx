@@ -90,28 +90,33 @@ export const LandingPage: React.FC = () => {
               Miembros del equipo
             </h3>
 
-            <div className="flex flex-col gap-4 justify-center items-center">
-              <p className="main-blue-meeting5 font-semibold">
-                Juan Pablo Pazmiño:
-                <span className="text-black font-normal"> Frontend Developer</span>
-              </p>
-              <p className="main-blue-meeting5 font-semibold">
-                Daniel Trujillo:
-                <span className="text-black font-normal"> Frontend Dev</span>
-              </p>
-              <p className="main-blue-meeting5 font-semibold">
-                Esteban Cordoba:
-                <span className="text-black font-normal"> Frontend Developer</span>
-              </p>
-              <p className="main-blue-meeting5 font-semibold">
-                Juan Sebastian:
-                <span className="text-black font-normal"> Backend Developer</span>
-              </p>
-              <p className="main-blue-meeting5 font-semibold">
-                James Calero:
-                <span className="text-black font-normal"> Backend Dev, scrum master</span>
-              </p>
+          <div className="flex flex-col gap-6 justify-center items-center">
+            <div className="flex flex-col items-center text-center">
+              <p className="main-blue-meeting5 font-semibold">Juan Pablo Pazmiño</p>
+              <p className="text-black font-normal text-sm">Frontend Developer</p>
             </div>
+
+            <div className="flex flex-col items-center text-center">
+              <p className="main-blue-meeting5 font-semibold">Daniel Trujillo</p>
+              <p className="text-black font-normal text-sm">Frontend Dev</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+             <p className="main-blue-meeting5 font-semibold">Esteban Cordoba</p>
+             <p className="text-black font-normal text-sm">Frontend Developer</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+             <p className="main-blue-meeting5 font-semibold">Juan Sebastian</p>
+             <p className="text-black font-normal text-sm">Backend Developer</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <p className="main-blue-meeting5 font-semibold">James Calero</p>
+              <p className="text-black font-normal text-sm">Backend Dev, Scrum Master</p>
+            </div>
+          </div>
+
           </section>
 
           {/* Misión */}
