@@ -23,7 +23,7 @@ import {
   closeAllPeers,
   stopLocalMedia,
 } from "../../webrtc/webrtc";
-import type { Participant, ChatMessage, roomCount, VideoCallRoomProps } from "../../types";
+import type { Participant, ChatMessage, VideoCallRoomProps } from "../../types";
 import { toast } from "sonner";
 
 interface ParticipantWithStream extends Participant {
@@ -47,10 +47,9 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   const [peerStreams, setPeerStreams] = useState<Record<string, MediaStream>>({});
 
   const [participants, setParticipants] = useState<ParticipantWithStream[]>(() => {
-    const selfId = user?._id || getSelfSocketId() || "local";
     return [
       {
-        id: selfId,
+        id: "local",
         name: selfName,
         isLocal: true,
         audioEnabled: true,
@@ -59,17 +58,34 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       },
     ];
   });
-  const selfId = useMemo(() => user?._id || getSelfSocketId() || "local", [user]);
+  const [selfId, setSelfId] = useState<string>("local");
 
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [showChat, setShowChat] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [isReady, setIsReady] = useState(false);
 
 
   useEffect(() => {
     let mounted = true;
+
+    // Wait for the socket ID to be assigned before proceeding.
+    // This ensures getSelfSocketId() is not null when we render.
+    const checkReady = () => {
+      const id = getSelfSocketId();
+      if (id) {
+        setSelfId(id);
+        setIsReady(true);
+      } else if (mounted) {
+        // Keep polling until we get an ID (usually within a few hundred ms)
+        const timer = setTimeout(checkReady, 100);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    checkReady();
 
     setOnPeerStream((peerId: string, stream: MediaStream) => {
       if (!mounted) return;
