@@ -59,6 +59,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       },
     ];
   });
+  const selfId = useMemo(() => user?._id || getSelfSocketId() || "local", [user]);
 
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
@@ -161,31 +162,59 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         }
     });
 
+    // Listen for peers toggling audio/video so we reflect their state in UI.
+    socket.on("new-av-status", ({ meetingId, peerId, audioEnabled, videoEnabled }: { meetingId: string, peerId: string; audioEnabled: boolean; videoEnabled: boolean }) => {
+      console.log("Received peer AV state:", { peerId, audioEnabled, videoEnabled });
+      if (!peerId) return;
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.id === peerId
+            ? { ...p, audioEnabled, videoEnabled }
+            : p
+        )
+      );
+    });
+
     return () => {
       mounted = false;
       socket.off("error");
       socket.off("room-count");
       socket.off("new-message");
+      socket.off("new-av-status");
     };
   }, [id, selfName]); // Dependencias
 
 
   const toggleAudio = () => {
+    const next = !isAudioEnabled;
     isAudioEnabled ? disableOutgoingStream() : enableOutgoingStream();
-    setIsAudioEnabled(!isAudioEnabled);
+    setIsAudioEnabled(next);
     setParticipants((prev) =>
-      prev.map((p) => (p.isLocal ? { ...p, audioEnabled: !isAudioEnabled } : p))
+      prev.map((p) => (p.isLocal ? { ...p, audioEnabled: next } : p))
     );
-    console.log(participants[0])
+    // Broadcast new state to peers so they can render the muted icon.
+    socket.emit("send-av-status", {
+      meetingId: id,
+      peerId: selfId,
+      audioEnabled: next,
+      videoEnabled: isVideoEnabled,
+    });
   };
 
   const toggleVideo = () => {
+    const next = !isVideoEnabled;
     isVideoEnabled ? disableOutgoingVideo() : enableOutgoingVideo();
-    setIsVideoEnabled(!isVideoEnabled);
+    setIsVideoEnabled(next);
     setParticipants((prev) =>
-      prev.map((p) => (p.isLocal ? { ...p, videoEnabled: !isVideoEnabled } : p))
+      prev.map((p) => (p.isLocal ? { ...p, videoEnabled: next } : p))
     );
-    console.log(participants[0])
+    // Broadcast new state to peers so they can render the camera-off icon.
+    socket.emit("send-av-status", {
+      meetingId: id,
+      peerId: selfId,
+      audioEnabled: isAudioEnabled,
+      videoEnabled: next,
+    });
   };
 
   const toggleChat = () => {
