@@ -181,6 +181,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     setParticipants((prev) =>
       prev.map((p) => (p.isLocal ? { ...p, audioEnabled: !isAudioEnabled } : p))
     );
+    console.log(participants[0])
   };
 
   const toggleVideo = () => {
@@ -189,6 +190,7 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     setParticipants((prev) =>
       prev.map((p) => (p.isLocal ? { ...p, videoEnabled: !isVideoEnabled } : p))
     );
+    console.log(participants[0])
   };
 
   const toggleChat = () => {

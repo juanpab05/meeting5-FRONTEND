@@ -12,10 +12,66 @@ export function VideoTile({ participant, compact = false }: VideoTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && participant.stream) {
-      videoRef.current.srcObject = participant.stream;
+    const v = videoRef.current;
+    if (!v) return;
+
+    // If video is disabled, ensure the element is cleared and paused.
+    if (!participant.videoEnabled || !participant.stream) {
+      try {
+        v.pause();
+      } catch (e) {
+        // ignore
+      }
+      try {
+        // detach media for privacy and to stop rendering
+        // setting to null ensures reassigning later triggers the renderer
+        // and avoids stale tracks being kept attached
+        // @ts-ignore
+        v.srcObject = null;
+      } catch (e) {
+        // ignore
+      }
+      return;
     }
-  }, [participant.stream]);
+
+    // Attach stream and attempt to play. Reassigning srcObject even if the
+    // stream object is the same helps some browsers re-render the video.
+    try {
+      // @ts-ignore
+      v.srcObject = null;
+    } catch (e) {
+      // ignore
+    }
+    // small timeout can help in some browsers to allow detaching before reattaching
+    const attach = () => {
+      try {
+        // @ts-ignore
+        v.srcObject = participant.stream;
+        const playPromise = v.play();
+        if (playPromise && typeof playPromise.then === "function") {
+          playPromise.catch(() => {
+            // Autoplay might be blocked; muted local streams should play.
+          });
+        }
+      } catch (err) {
+        console.warn("Failed to attach stream to video element", err);
+      }
+    };
+
+    // Use a microtask to avoid layout thrashing when toggling quickly
+    const t = window.setTimeout(attach, 0);
+
+    return () => {
+      clearTimeout(t);
+      try {
+        v.pause();
+        // @ts-ignore
+        v.srcObject = null;
+      } catch (e) {
+        // ignore
+      }
+    };
+  }, [participant.stream, participant.videoEnabled]);
 
   const getInitials = (name: string) =>
     name
