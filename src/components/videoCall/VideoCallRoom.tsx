@@ -270,6 +270,26 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     stream: p.isLocal ? localMediaStream || undefined : peerStreams[p.id] || p.stream,
   }));
 
+  // Show loading screen until socket ID is ready
+  if (!isReady) {
+    return (
+      <div
+        className="h-screen flex items-center justify-center bg-gray-900"
+        role="status"
+        aria-live="polite"
+        aria-label="Conectando a la reunión"
+      >
+        <div className="text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="w-16 h-16 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin"></div>
+          </div>
+          <p className="text-gray-300 text-xl font-semibold">Conectando a la reunión...</p>
+          <p className="text-gray-500 text-sm mt-2">Espera un momento</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen flex flex-col bg-gray-900" role="main" aria-label="Sala de videollamada">
       <div id="sr-message-updates" aria-live="polite" className="sr-only"></div>
