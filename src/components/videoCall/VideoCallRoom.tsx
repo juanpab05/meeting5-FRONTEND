@@ -273,7 +273,12 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   // Show loading screen until socket ID is ready
   if (!isReady) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-900">
+      <div
+        className="h-screen flex items-center justify-center bg-gray-900"
+        role="status"
+        aria-live="polite"
+        aria-label="Conectando a la reunión"
+      >
         <div className="text-center">
           <div className="mb-4 flex justify-center">
             <div className="w-16 h-16 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin"></div>
