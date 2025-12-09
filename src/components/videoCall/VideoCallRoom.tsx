@@ -23,7 +23,7 @@ import {
   closeAllPeers,
   stopLocalMedia,
 } from "../../webrtc/webrtc";
-import type { Participant, ChatMessage, roomCount, VideoCallRoomProps } from "../../types";
+import type { Participant, ChatMessage, VideoCallRoomProps } from "../../types";
 import { toast } from "sonner";
 
 interface ParticipantWithStream extends Participant {
@@ -44,14 +44,12 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
   );
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [numParticipants, setNumParticipants] = useState(1);
   const [peerStreams, setPeerStreams] = useState<Record<string, MediaStream>>({});
 
   const [participants, setParticipants] = useState<ParticipantWithStream[]>(() => {
-    const selfId = user?._id || getSelfSocketId() || "local";
     return [
       {
-        id: selfId,
+        id: "local",
         name: selfName,
         isLocal: true,
         audioEnabled: true,
@@ -60,16 +58,34 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       },
     ];
   });
+  const [selfId, setSelfId] = useState<string>("local");
 
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [showChat, setShowChat] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [isReady, setIsReady] = useState(false);
 
 
   useEffect(() => {
     let mounted = true;
+
+    // Wait for the socket ID to be assigned before proceeding.
+    // This ensures getSelfSocketId() is not null when we render.
+    const checkReady = () => {
+      const id = getSelfSocketId();
+      if (id) {
+        setSelfId(id);
+        setIsReady(true);
+      } else if (mounted) {
+        // Keep polling until we get an ID (usually within a few hundred ms)
+        const timer = setTimeout(checkReady, 100);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    checkReady();
 
     setOnPeerStream((peerId: string, stream: MediaStream) => {
       if (!mounted) return;
@@ -142,10 +158,6 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       connectRoomSocket(id);
     }
 
-    socket.on("room-count", (roomCount: roomCount) => {
-      setNumParticipants(roomCount.uniqueUserCount + 1);
-    });
-
     socket.on("new-message", (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev, msg]);
       const liveRegion = document.getElementById("sr-message-updates");
@@ -166,29 +178,59 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
         }
     });
 
+    // Listen for peers toggling audio/video so we reflect their state in UI.
+    socket.on("new-av-status", ({ meetingId, peerId, audioEnabled, videoEnabled }: { meetingId: string, peerId: string; audioEnabled: boolean; videoEnabled: boolean }) => {
+      console.log("Received peer AV state:", { peerId, audioEnabled, videoEnabled });
+      if (!peerId) return;
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.id === peerId
+            ? { ...p, audioEnabled, videoEnabled }
+            : p
+        )
+      );
+    });
+
     return () => {
       mounted = false;
       socket.off("error");
       socket.off("room-count");
       socket.off("new-message");
+      socket.off("new-av-status");
     };
   }, [id, selfName]); // Dependencias
 
 
   const toggleAudio = () => {
+    const next = !isAudioEnabled;
     isAudioEnabled ? disableOutgoingStream() : enableOutgoingStream();
-    setIsAudioEnabled(!isAudioEnabled);
+    setIsAudioEnabled(next);
     setParticipants((prev) =>
-      prev.map((p) => (p.isLocal ? { ...p, audioEnabled: !isAudioEnabled } : p))
+      prev.map((p) => (p.isLocal ? { ...p, audioEnabled: next } : p))
     );
+    // Broadcast new state to peers so they can render the muted icon.
+    socket.emit("send-av-status", {
+      meetingId: id,
+      peerId: selfId,
+      audioEnabled: next,
+      videoEnabled: isVideoEnabled,
+    });
   };
 
   const toggleVideo = () => {
+    const next = !isVideoEnabled;
     isVideoEnabled ? disableOutgoingVideo() : enableOutgoingVideo();
-    setIsVideoEnabled(!isVideoEnabled);
+    setIsVideoEnabled(next);
     setParticipants((prev) =>
-      prev.map((p) => (p.isLocal ? { ...p, videoEnabled: !isVideoEnabled } : p))
+      prev.map((p) => (p.isLocal ? { ...p, videoEnabled: next } : p))
     );
+    // Broadcast new state to peers so they can render the camera-off icon.
+    socket.emit("send-av-status", {
+      meetingId: id,
+      peerId: selfId,
+      audioEnabled: isAudioEnabled,
+      videoEnabled: next,
+    });
   };
 
   const toggleChat = () => {
@@ -228,6 +270,26 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
     stream: p.isLocal ? localMediaStream || undefined : peerStreams[p.id] || p.stream,
   }));
 
+  // Show loading screen until socket ID is ready
+  if (!isReady) {
+    return (
+      <div
+        className="h-screen flex items-center justify-center bg-gray-900"
+        role="status"
+        aria-live="polite"
+        aria-label="Conectando a la reunión"
+      >
+        <div className="text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="w-16 h-16 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin"></div>
+          </div>
+          <p className="text-gray-300 text-xl font-semibold">Conectando a la reunión...</p>
+          <p className="text-gray-500 text-sm mt-2">Espera un momento</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen flex flex-col bg-gray-900" role="main" aria-label="Sala de videollamada">
       <div id="sr-message-updates" aria-live="polite" className="sr-only"></div>
@@ -261,9 +323,9 @@ export function VideoCallRoom({ onLeave }: VideoCallRoomProps = {}) {
       </p>
       <p
         className="text-xs text-gray-400 mt-1"
-        aria-label={`Hay ${numParticipants} participantes`}
+        aria-label={`Hay ${participants.length} participantes`}
       >
-        {numParticipants} {numParticipants === 1 ? "participante" : "participantes"}
+        {participants.length} {participants.length === 1 ? "participante" : "participantes"}
           </p>
       </div>
 
