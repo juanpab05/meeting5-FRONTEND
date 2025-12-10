@@ -136,6 +136,16 @@ export const NavbarMobile: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
               Mapa del sitio
             </button>
           </div>
+          <div className={fila}>
+            <a
+              href="https://drive.google.com/file/d/1Y3SsD-8r0bYFF3t-Srzxvv-E8JxDpTCH/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={hover}
+            >
+              Manual de usuario
+            </a>
+          </div>
         </nav>
       </div>
     </div>

@@ -65,13 +65,15 @@ export const Header: React.FC<PropsAuth> = ({ auth, setAuth }) => {
           Sobre nosotros
         </a>
 
-        <Link
-          to="/"
+        <a
+          href="https://drive.google.com/file/d/1Y3SsD-8r0bYFF3t-Srzxvv-E8JxDpTCH/view?usp=sharing"
           aria-label="Acceder al manual de usuario"
+          rel ="noopener noreferrer"
+          target="_blank"
           className={hover}
         >
           Manual de usuario
-        </Link>
+        </a>
       </nav>
 
       {/** === LOGIN === */}
