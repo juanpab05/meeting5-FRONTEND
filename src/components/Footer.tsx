@@ -76,7 +76,7 @@ export const Footer = () => {
             </a>
 
             <a
-              href="https://youtube.com"
+              href="https://drive.google.com/file/d/1Y3SsD-8r0bYFF3t-Srzxvv-E8JxDpTCH/view?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
               className={linkClass}
